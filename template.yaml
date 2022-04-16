@@ -1,0 +1,74 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: SAM template for WatchWizard Application
+Globals:
+  Function:
+    Runtime: python3.9
+    Timeout: 30
+Parameters:
+  ServiceName:
+    Type: String
+    Default: WatchWizard
+Resources:
+  LambdaRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Policies:
+        - PolicyName: !Sub "${ServiceName}-Lambda-Policy"
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - "secretsmanager:DescribeSecret"
+                  - "secretsmanager:GetSecretValue"
+                  - "secretsmanager:PutSecretValue"
+                Resource:
+                  - !Ref SecretsManagerSecret
+            
+  SecretsManagerSecret:
+    Type: AWS::SecretsManager::Secret
+    Properties:
+      Name: !Sub "apps/${ServiceName}"
+      Description: !Sub "Secret values for the ${ServiceName} application"
+      SecretString: '{"TraktClientId": "", "TraktClientSecret": ""}'
+
+  ApiGatewayApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: "Prod"
+      Name:
+        Fn::Sub: "${ServiceName}-ApiGateway"
+      DefinitionBody:
+        Fn::Transform:
+          Name: AWS::Include
+          Parameters:
+            Location: "./api.json"
+      MethodSettings:
+      - LoggingLevel: ERROR
+        ResourcePath: "/*"
+        HttpMethod: "*"
+
+  ConnectTraktFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub "${ServiceName}-ConnectTrakt"
+      Role: !GetAtt LambdaRole.Arn
+      CodeUri: watch-wizard/
+      Handler: trakt.lambda_handler
+      Events:
+        Get:
+          Type: Api
+          Properties:
+            RestApiId:
+              Ref: ApiGatewayApi
+            Path: "/connect-trakt"
+            Method: get
