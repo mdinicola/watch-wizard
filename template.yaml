@@ -45,8 +45,9 @@ Resources:
     Type: AWS::Serverless::Api
     Properties:
       StageName: "Prod"
-      Name:
-        Fn::Sub: "${ServiceName}-ApiGateway"
+      Name: !Sub "${ServiceName}-ApiGateway"
+      Auth:
+        ApiKeyRequired: true
       DefinitionBody:
         Fn::Transform:
           Name: AWS::Include
@@ -56,6 +57,38 @@ Resources:
       - LoggingLevel: ERROR
         ResourcePath: "/*"
         HttpMethod: "*"
+
+  UsagePlan:
+    Type: AWS::ApiGateway::UsagePlan
+    Properties:
+      UsagePlanName: !Sub "${ServiceName}-Default-Usage-Plan"
+      ApiStages:
+        - ApiId: !Ref ApiGatewayApi
+          Stage: Prod
+      Description: !Sub "Default usage plan for the ${ServiceName} service"
+      Quota:
+        Limit: 5000
+        Period: MONTH
+      Throttle:
+        BurstLimit: 200
+        RateLimit: 100
+
+  ApiKey:
+    Type: AWS::ApiGateway::ApiKey
+    Properties:
+      Name: !Sub "${ServiceName}-Default-API-Key"
+      Description: !Sub "Default API key for the ${ServiceName} service"
+      Enabled: True
+      StageKeys:
+        - RestApiId: !Ref ApiGatewayApi
+          StageName: Prod
+
+  UsagePlanApiKey:
+    Type: AWS::ApiGateway::UsagePlanKey
+    Properties: 
+      KeyId: !Ref ApiKey
+      KeyType: 'API_KEY'
+      UsagePlanId: !Ref UsagePlan
 
   ConnectTraktFunction:
     Type: AWS::Serverless::Function
