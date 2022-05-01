@@ -40,8 +40,8 @@ Resources:
   SecretsManagerTraktSecret:
     Type: AWS::SecretsManager::Secret
     Properties:
-      Name: !Sub "apps/${ServiceName}"
-      Description: !Sub "Secret values for the ${ServiceName} application"
+      Name: !Sub "apps/${ServiceName}-Trakt"
+      Description: !Sub "Trakt-specific secret values for the ${ServiceName} application"
       SecretString: '{"CLIENT_ID": "", "CLIENT_SECRET": ""}'
 
   ApiGatewayApi:
@@ -102,7 +102,7 @@ Resources:
       Handler: trakt_handler.get_auth_code
       Environment:
         Variables:
-          TraktSecretName: !Sub "apps/${ServiceName}"
+          TraktSecretName: !Sub "apps/${ServiceName}-Trakt"
       Events:
         Get:
           Type: Api
@@ -121,7 +121,7 @@ Resources:
       Handler: trakt_handler.authenticate
       Environment:
         Variables:
-          TraktSecretName: !Sub "apps/${ServiceName}"
+          TraktSecretName: !Sub "apps/${ServiceName}-Trakt"
       Events:
         Get:
           Type: Api
