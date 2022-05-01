@@ -55,7 +55,7 @@ Resources:
         Fn::Transform:
           Name: AWS::Include
           Parameters:
-            Location: "./api.json"
+            Location: "./api.yaml"
       MethodSettings:
       - LoggingLevel: ERROR
         ResourcePath: "/*"
