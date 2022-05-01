@@ -1,44 +1,120 @@
 {
-    "swagger": "2.0",
-    "info": {
-      "title": "Covid Notify",
-      "description": "API for Covid Notify application",
-      "version": "1.0.0"
-    },
-    "basePath": "/",
-    "paths": {
-      "/connect-trakt": {
-        "get": {
-          "summary": "Trakt Initialization Function",
-          "description": "Connects and authorizes with Trakt API",
-          "operationId": "ConnectTraktFunction",
-          "produces": [
-            "application/json"
-          ],
-          "responses": {
-            "200": {
-              "description": "Success"
-            },
-            "404": {
-              "description": "Not found"
-            },
-            "500": {
-              "description": "500 Internal Server Error"
-            },
-            "503": {
-              "description": "SERVICE UNAVAILABLE"
-            }
+  "swagger": "2.0",
+  "info": {
+    "title": "Watch Wizard",
+    "description": "API for Watch Wizard application",
+    "version": "1.0.0"
+  },
+  "basePath": "/",
+  "paths": {
+    "/trakt/auth-code": {
+      "get": {
+        "summary": "Trakt GetAuthCode Function",
+        "description": "Gets a device code to be used for authenticating with the Trakt API",
+        "operationId": "TraktGetAuthCodeFunction",
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
           },
-          "x-amazon-apigateway-integration": {
-            "type": "aws_proxy",
-            "httpMethod": "POST",
-            "uri": {
-              "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ConnectTraktFunction.Arn}/invocations"
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "500 Internal Server Error"
+          },
+          "503": {
+            "description": "SERVICE UNAVAILABLE"
+          }
+        },
+        "x-amazon-apigateway-integration": {
+          "type": "aws_proxy",
+          "httpMethod": "POST",
+          "uri": {
+            "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${TraktGetAuthCodeFunction.Arn}/invocations"
+          }
+        }
+      }
+    },
+    "/trakt/authenticate": {
+      "post": {
+        "summary": "Trakt Authenticate Function",
+        "description": "Authenticates a device for use with the Trakt API",
+        "operationId": "TraktAuthenticateFunction",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "data",
+            "description": "The device_code to use for authentication with the Trakt API",
+            "schema": {
+              "$ref": "#/definitions/DeviceCode"
             }
+          } 
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "409": {
+            "description": "You already approved this code"
+          },
+          "410": {
+            "description": "The tokens have expired, restart the process"
+          },
+          "418": {
+            "description": "You explicitly denied this code"
+          },
+          "500": {
+            "description": "500 Internal Server Error"
+          },
+          "503": {
+            "description": "SERVICE UNAVAILABLE"
+          }
+        },
+        "x-amazon-apigateway-integration": {
+          "type": "aws_proxy",
+          "httpMethod": "POST",
+          "uri": {
+            "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${TraktAuthenticateFunction.Arn}/invocations"
           }
         }
       }
     }
+  },
+  "definitions": {
+    "DeviceCode": {
+      "type": "object",
+      "required": [
+        "deviceCode",
+        "pollInterval"
+      ],
+      "properties": {
+        "device_code": {
+          "type": "string"
+        },
+        "poll_interval": {
+          "type": "integer"
+        },
+        "user_code": {
+          "type": "string"
+        },
+        "verification_url": {
+          "type": "string"
+        }
+      }
+    }
   }
+}
   
   

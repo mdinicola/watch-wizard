@@ -90,18 +90,34 @@ Resources:
       KeyType: 'API_KEY'
       UsagePlanId: !Ref UsagePlan
 
-  ConnectTraktFunction:
+  TraktGetAuthCodeFunction:
     Type: AWS::Serverless::Function
     Properties:
-      FunctionName: !Sub "${ServiceName}-ConnectTrakt"
+      FunctionName: !Sub "${ServiceName}-Trakt-GetAuthCode"
       Role: !GetAtt LambdaRole.Arn
       CodeUri: watch-wizard/
-      Handler: trakt.lambda_handler
+      Handler: trakt_handler.get_auth_code
       Events:
         Get:
           Type: Api
           Properties:
             RestApiId:
               Ref: ApiGatewayApi
-            Path: "/connect-trakt"
+            Path: "/trakt/auth-code"
             Method: get
+
+  TraktAuthenticateFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub "${ServiceName}-Trakt-Authenticate"
+      Role: !GetAtt LambdaRole.Arn
+      CodeUri: watch-wizard/
+      Handler: trakt_handler.authenticate
+      Events:
+        Get:
+          Type: Api
+          Properties:
+            RestApiId:
+              Ref: ApiGatewayApi
+            Path: "/trakt/authenticate"
+            Method: post
