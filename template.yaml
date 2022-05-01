@@ -5,6 +5,9 @@ Globals:
   Function:
     Runtime: python3.9
     Timeout: 30
+    Environment:
+      Variables:
+        ServiceName: !Ref ServiceName
 Parameters:
   ServiceName:
     Type: String
@@ -32,14 +35,14 @@ Resources:
                   - "secretsmanager:GetSecretValue"
                   - "secretsmanager:PutSecretValue"
                 Resource:
-                  - !Ref SecretsManagerSecret
+                  - !Ref SecretsManagerTraktSecret
             
-  SecretsManagerSecret:
+  SecretsManagerTraktSecret:
     Type: AWS::SecretsManager::Secret
     Properties:
       Name: !Sub "apps/${ServiceName}"
       Description: !Sub "Secret values for the ${ServiceName} application"
-      SecretString: '{"TraktClientId": "", "TraktClientSecret": ""}'
+      SecretString: '{"CLIENT_ID": "", "CLIENT_SECRET": ""}'
 
   ApiGatewayApi:
     Type: AWS::Serverless::Api
@@ -97,6 +100,9 @@ Resources:
       Role: !GetAtt LambdaRole.Arn
       CodeUri: watch-wizard/
       Handler: trakt_handler.get_auth_code
+      Environment:
+        Variables:
+          TraktSecretName: !Sub "apps/${ServiceName}"
       Events:
         Get:
           Type: Api
@@ -113,6 +119,9 @@ Resources:
       Role: !GetAtt LambdaRole.Arn
       CodeUri: watch-wizard/
       Handler: trakt_handler.authenticate
+      Environment:
+        Variables:
+          TraktSecretName: !Sub "apps/${ServiceName}"
       Events:
         Get:
           Type: Api

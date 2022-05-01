@@ -52,10 +52,10 @@
         "parameters": [
           {
             "in": "body",
-            "name": "data",
-            "description": "The device_code to use for authentication with the Trakt API",
+            "name": "device_auth_data",
+            "description": "The auth_data to use for authentication with the Trakt API",
             "schema": {
-              "$ref": "#/definitions/DeviceCode"
+              "$ref": "#/definitions/DeviceAuthData"
             }
           } 
         ],
@@ -93,11 +93,11 @@
     }
   },
   "definitions": {
-    "DeviceCode": {
+    "DeviceAuthData": {
       "type": "object",
       "required": [
-        "deviceCode",
-        "pollInterval"
+        "device_code",
+        "poll_interval"
       ],
       "properties": {
         "device_code": {

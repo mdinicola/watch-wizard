@@ -1,13 +1,15 @@
 from dataclasses import dataclass, is_dataclass, asdict
+from multiprocessing.sharedctypes import Value
 from secretsmanager import SecretsManagerSecret
 from trakt import core
+from os import environ
 import json
 import time
 import boto3
 import logging
 
-SERVICE_NAME = 'WatchWizard'
-SECRET_NAME = f'apps/{SERVICE_NAME}'
+SERVICE_NAME = environ['ServiceName']
+SECRET_NAME = environ['TraktSecretName']
 TRAKT_CLIENT_ID_KEY = 'CLIENT_ID'
 TRAKT_CLIENT_SECRET_KEY = 'CLIENT_SECRET'
 
@@ -20,21 +22,15 @@ class EnhancedJSONEncoder(json.JSONEncoder):
         return super().default(o)
 
 @dataclass
-class DeviceCode:
+class DeviceAuthData:
     user_code: str
     device_code: str
     verification_url: str
     poll_interval: int
 
-@dataclass
-class DeviceToken:
-    oauth_token: str
-    oauth_refresh: str
-    oauth_expires_at: str
-
 def _request_device_code(client_id: str, client_secret: str):
     response = core.get_device_code(client_id = client_id, client_secret = client_secret)
-    return DeviceCode(user_code = response['user_code'], device_code = response['device_code'], 
+    return DeviceAuthData(user_code = response['user_code'], device_code = response['device_code'], 
         verification_url = response['verification_url'], poll_interval = response['interval'])
 
 def get_auth_code(event, context):
@@ -44,17 +40,37 @@ def get_auth_code(event, context):
     device_code = _request_device_code(client_id, client_secret)
 
     response = {
-        'data': device_code
+        'device_auth_data': device_code
     }
 
     return {
-        "statusCode": 200,
-        "body": json.dumps(response, cls=EnhancedJSONEncoder)
+        'statusCode': 200,
+        'body': json.dumps(response, cls=EnhancedJSONEncoder)
     }
 
 def authenticate(event, context):
-    body = json.loads(event['body'])
-    device_code = body['data']['device_code']
+    try:
+        device_auth_data = json.loads(event['body'])['device_auth_data']
+        device_code = device_auth_data['device_code']
+        interval = device_auth_data['poll_interval']
+    except (KeyError, ValueError):
+        response = {
+            'message': 'Request must include valid device_auth_data'
+        }
+        return {
+            'statusCode': 400,
+            'body': json.dumps({
+                'message': 'Request must include valid device_auth_data'
+            })
+        }
+    except:
+        return {
+            'statusCode': 400,
+            'body': json.dumps({
+                'message': 'Malformed request'
+            })
+        }
+
     core.CONFIG_TYPE = 'AWS_SECRETS_MANAGER'
     core.CONFIG_SECRET_NAME = SECRET_NAME
     core.load_config()
@@ -72,12 +88,10 @@ def authenticate(event, context):
         'message': 'Something went wrong.  Please try again',
         'status_code': 500
     }
-    
-    interval = body['data']['poll_interval']
 
     while True:
         auth_response = core.get_device_token(device_code = device_code, 
-            client_id= core.CLIENT_ID, client_secret = core.CLIENT_SECRET, store = True)
+            client_id = core.CLIENT_ID, client_secret = core.CLIENT_SECRET, store = True)
 
         if auth_response.status_code == 200:
             response['message'] = success_message
@@ -95,6 +109,6 @@ def authenticate(event, context):
         time.sleep(interval)
 
     return {
-        "statusCode": response['status_code'],
-        "body": json.dumps(response, cls=EnhancedJSONEncoder)
+        'statusCode': response['status_code'],
+        'body': json.dumps(response, cls=EnhancedJSONEncoder)
     }
