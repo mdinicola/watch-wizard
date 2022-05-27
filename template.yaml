@@ -98,8 +98,8 @@ Resources:
     Properties:
       FunctionName: !Sub "${ServiceName}-Trakt-GetAuthCode"
       Role: !GetAtt LambdaRole.Arn
-      CodeUri: watch-wizard/
-      Handler: trakt_handler.get_auth_code
+      CodeUri: watch_wizard/
+      Handler: handlers/trakt_handler.get_auth_code
       Environment:
         Variables:
           TraktSecretName: !Sub "apps/${ServiceName}-Trakt"
@@ -112,13 +112,13 @@ Resources:
             Path: "/trakt/auth-code"
             Method: get
 
-  TraktAuthenticateFunction:
+  TraktAuthenticateDeviceFunction:
     Type: AWS::Serverless::Function
     Properties:
-      FunctionName: !Sub "${ServiceName}-Trakt-Authenticate"
+      FunctionName: !Sub "${ServiceName}-Trakt-AuthenticateDevice"
       Role: !GetAtt LambdaRole.Arn
-      CodeUri: watch-wizard/
-      Handler: trakt_handler.authenticate
+      CodeUri: watch_wizard/
+      Handler: handlers/trakt_handler.authenticate_device
       Environment:
         Variables:
           TraktSecretName: !Sub "apps/${ServiceName}-Trakt"
@@ -128,5 +128,5 @@ Resources:
           Properties:
             RestApiId:
               Ref: ApiGatewayApi
-            Path: "/trakt/authenticate"
+            Path: "/trakt/authenticate-device"
             Method: post

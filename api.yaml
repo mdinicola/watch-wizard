@@ -27,7 +27,7 @@ paths:
         httpMethod: POST
         uri: 
           Fn::Sub: "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${TraktGetAuthCodeFunction.Arn}/invocations"
-  "/trakt/authenticate":
+  "/trakt/authenticate-device":
     post:
       summary: Trakt Authenticate Function
       description: Authenticates a device for use with the Trakt API
@@ -61,7 +61,7 @@ paths:
         type: aws_proxy
         httpMethod: POST
         uri: 
-          Fn::Sub: "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${TraktAuthenticateFunction.Arn}/invocations"
+          Fn::Sub: "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${TraktAuthenticateDeviceFunction.Arn}/invocations"
 definitions:
   DeviceAuthData:
     type: object
