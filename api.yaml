@@ -62,6 +62,48 @@ paths:
         httpMethod: POST
         uri: 
           Fn::Sub: "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${TraktAuthenticateDeviceFunction.Arn}/invocations"
+  "/trakt/recommend-movie":
+    get:
+      summary: Trakt RecommendMovie Function
+      description: Recommends a movie using Trakt API
+      operationId: TraktRecommendMovieFunction
+      produces:
+        - application/json
+      responses:
+        200:
+          description: Success
+        404:
+          description: Not found
+        500:
+          description: 500 Internal Server Error
+        503:
+          description: SERVICE UNAVAILABLE
+      x-amazon-apigateway-integration:
+        type: aws_proxy
+        httpMethod: POST
+        uri: 
+          Fn::Sub: "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${TraktRecommendMovieFunction.Arn}/invocations"
+  "/trakt/recommend-movie-and-speak":
+    post:
+      summary: Trakt RecommendMovie Function
+      description: Recommends a movie using Trakt API
+      operationId: TraktRecommendMovieFunction
+      produces:
+        - application/json
+      responses:
+        200:
+          description: Success
+        404:
+          description: Not found
+        500:
+          description: 500 Internal Server Error
+        503:
+          description: SERVICE UNAVAILABLE
+      x-amazon-apigateway-integration:
+        type: aws_proxy
+        httpMethod: POST
+        uri: 
+          Fn::Sub: "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${TraktRecommendMovieAndSpeakFunction.Arn}/invocations"
 definitions:
   DeviceAuthData:
     type: object
