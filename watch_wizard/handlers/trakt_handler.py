@@ -1,4 +1,4 @@
-from dataclasses import is_dataclass, asdict
+from common.enhanced_json_encoder import EnhancedJSONEncoder
 from clients.trakt_client import TraktClient
 from clients.aws_secrets_manager import SecretsManagerSecret
 from os import environ
@@ -11,12 +11,6 @@ TRAKT_CLIENT_ID_KEY = 'CLIENT_ID'
 TRAKT_CLIENT_SECRET_KEY = 'CLIENT_SECRET'
 
 _logger = logging.getLogger(__name__)
-
-class EnhancedJSONEncoder(json.JSONEncoder):
-    def default(self, o):
-        if is_dataclass(o):
-            return asdict(o)
-        return super().default(o)
 
 def get_auth_code(event, context):
     secret = SecretsManagerSecret(client = boto3.client('secretsmanager'), secret_name = AWS_SECRET_NAME)
@@ -58,6 +52,14 @@ def authenticate_device(event, context):
         })
     }
 
-def recommend_movie():
+def recommend_movie(event, context):
+    movie = get_recommended_movie()
+    
+    return {
+        'statusCode': 200,
+        'body': json.dumps(movie, cls=EnhancedJSONEncoder)
+    }
+
+def get_recommended_movie():
     trakt_client = TraktClient(AWS_SECRET_NAME)
     return trakt_client.get_recommended_movie()

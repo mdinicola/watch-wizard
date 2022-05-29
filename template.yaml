@@ -137,7 +137,7 @@ Resources:
       FunctionName: !Sub "${ServiceName}-RecommendMovie"
       Role: !GetAtt LambdaRole.Arn
       CodeUri: watch_wizard/
-      Handler: handlers/app_handler.recommend_movie
+      Handler: handlers/trakt_handler.recommend_movie
       Environment:
         Variables:
           TraktSecretName: !Sub "apps/${ServiceName}-Trakt"
@@ -156,7 +156,7 @@ Resources:
       FunctionName: !Sub "${ServiceName}-RecommendMovieAndSpeak"
       Role: !GetAtt LambdaRole.Arn
       CodeUri: watch_wizard/
-      Handler: handlers/app_handler.recommend_movie_and_speak
+      Handler: handlers/google_actions_handler.recommend_movie_and_speak
       Environment:
         Variables:
           TraktSecretName: !Sub "apps/${ServiceName}-Trakt"

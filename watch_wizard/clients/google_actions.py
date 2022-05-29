@@ -2,7 +2,7 @@ import logging
 
 _logger = logging.getLogger(__name__)
 
-def format_google_actions_response(request_data: dict, message: str):
+def format_response(request_data: dict, message: str):
     response = {}
     response['session'] = {}
     response['session']['id'] = request_data['session']['id']

@@ -1,19 +1,11 @@
-from dataclasses import dataclass, is_dataclass, asdict
 from trakt import core
 from trakt import movies as trakt_movies
-from models.movie import Movie
+from models.device_auth_data import DeviceAuthData
 import logging
 import time
 import random
 
 _logger = logging.getLogger(__name__)
-
-@dataclass
-class DeviceAuthData:
-    user_code: str
-    device_code: str
-    verification_url: str
-    poll_interval: int
 
 class TraktClient:
     def __init__(self, aws_secret_name):
@@ -74,5 +66,4 @@ class TraktClient:
         return response
 
     def get_recommended_movie(self):
-        trakt_movie = random.choice(trakt_movies.get_recommended_movies())
-        return Movie.from_trakt_movie(trakt_movie)
+        return random.choice(trakt_movies.get_recommended_movies())
