@@ -27,6 +27,8 @@ paths:
         httpMethod: POST
         uri: 
           Fn::Sub: "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${TraktGetAuthCodeFunction.Arn}/invocations"
+      security:
+        - api_key: []
   "/trakt/authenticate-device":
     post:
       summary: Trakt Authenticate Function
@@ -62,11 +64,13 @@ paths:
         httpMethod: POST
         uri: 
           Fn::Sub: "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${TraktAuthenticateDeviceFunction.Arn}/invocations"
-  "/trakt/recommend-movie":
+      security:
+        - api_key: []
+  "/movies/recommend-movie":
     get:
-      summary: Trakt RecommendMovie Function
-      description: Recommends a movie using Trakt API
-      operationId: TraktRecommendMovieFunction
+      summary: RecommendMovie Function
+      description: Recommends a movie
+      operationId: RecommendMovieFunction
       produces:
         - application/json
       responses:
@@ -82,12 +86,14 @@ paths:
         type: aws_proxy
         httpMethod: POST
         uri: 
-          Fn::Sub: "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${TraktRecommendMovieFunction.Arn}/invocations"
-  "/trakt/recommend-movie-and-speak":
+          Fn::Sub: "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${RecommendMovieFunction.Arn}/invocations"
+      security:
+        - api_key: []
+  "/movies/recommend-movie-and-speak":
     post:
-      summary: Trakt RecommendMovie Function
-      description: Recommends a movie using Trakt API
-      operationId: TraktRecommendMovieFunction
+      summary: RecommendMovieAndSpeak Function
+      description: Recommends a movie and speaks it using Google Actions Webhooks
+      operationId: RecommendMovieAndSpeakFunction
       produces:
         - application/json
       responses:
@@ -103,7 +109,15 @@ paths:
         type: aws_proxy
         httpMethod: POST
         uri: 
-          Fn::Sub: "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${TraktRecommendMovieAndSpeakFunction.Arn}/invocations"
+          Fn::Sub: "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${RecommendMovieAndSpeakFunction.Arn}/invocations"
+schemes:
+  - https
+securityDefinitions:
+  api_key:
+    type: apiKey
+    name: x-api-key
+    in: header
+    x-amazon-apigateway-api-key-source: HEADER
 definitions:
   DeviceAuthData:
     type: object

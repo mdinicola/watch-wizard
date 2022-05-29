@@ -131,13 +131,13 @@ Resources:
             Path: "/trakt/authenticate-device"
             Method: post
 
-  TraktRecommendMovieFunction:
+  RecommendMovieFunction:
     Type: AWS::Serverless::Function
     Properties:
-      FunctionName: !Sub "${ServiceName}-Trakt-RecommendMovie"
+      FunctionName: !Sub "${ServiceName}-RecommendMovie"
       Role: !GetAtt LambdaRole.Arn
       CodeUri: watch_wizard/
-      Handler: handlers/trakt_handler.recommend_movie
+      Handler: handlers/app_handler.recommend_movie
       Environment:
         Variables:
           TraktSecretName: !Sub "apps/${ServiceName}-Trakt"
@@ -147,16 +147,16 @@ Resources:
           Properties:
             RestApiId:
               Ref: ApiGatewayApi
-            Path: "/trakt/recommend-movie"
+            Path: "/movies/recommend-movie"
             Method: get
 
-  TraktRecommendMovieAndSpeakFunction:
+  RecommendMovieAndSpeakFunction:
     Type: AWS::Serverless::Function
     Properties:
-      FunctionName: !Sub "${ServiceName}-Trakt-RecommendMovieAndSpeak"
+      FunctionName: !Sub "${ServiceName}-RecommendMovieAndSpeak"
       Role: !GetAtt LambdaRole.Arn
       CodeUri: watch_wizard/
-      Handler: handlers/trakt_handler.recommend_movie_and_speak
+      Handler: handlers/app_handler.recommend_movie_and_speak
       Environment:
         Variables:
           TraktSecretName: !Sub "apps/${ServiceName}-Trakt"
@@ -166,5 +166,7 @@ Resources:
           Properties:
             RestApiId:
               Ref: ApiGatewayApi
-            Path: "/trakt/recommend-movie-and-speak"
+            Path: "/movies/recommend-movie-and-speak"
             Method: post
+            Auth:
+              ApiKeyRequired: false

@@ -1,13 +1,11 @@
 from dataclasses import is_dataclass, asdict
 from clients.trakt_client import TraktClient
 from clients.aws_secrets_manager import SecretsManagerSecret
-from clients.google_assistant import format_google_actions_response
 from os import environ
 import json
 import boto3
 import logging
 
-SERVICE_NAME = environ['ServiceName']
 AWS_SECRET_NAME = environ['TraktSecretName']
 TRAKT_CLIENT_ID_KEY = 'CLIENT_ID'
 TRAKT_CLIENT_SECRET_KEY = 'CLIENT_SECRET'
@@ -60,26 +58,6 @@ def authenticate_device(event, context):
         })
     }
 
-def recommend_movie(event, context):
+def recommend_movie():
     trakt_client = TraktClient(AWS_SECRET_NAME)
-    movie = trakt_client.get_recommended_movie()
-
-    message = f'You should watch {movie.title} ({movie.year})'
-
-    return {
-        'statusCode': 200,
-        'body': json.dumps(message)
-    }
-
-def recommend_movie_and_speak(event, context):
-    trakt_client = TraktClient(AWS_SECRET_NAME)
-    movie = trakt_client.get_recommended_movie()
-
-    message = f'You should watch {movie.title} ({movie.year})'
-    request_data = json.loads(event['body'])
-    response = format_google_actions_response(request_data, message)
-
-    return {
-        'statusCode': 200,
-        'body': json.dumps(response)
-    }
+    return trakt_client.get_recommended_movie()
