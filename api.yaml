@@ -89,11 +89,11 @@ paths:
           Fn::Sub: "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${RecommendMovieFunction.Arn}/invocations"
       security:
         - api_key: []
-  "/movies/recommend-movie-and-speak":
+  "/google-actions":
     post:
-      summary: RecommendMovieAndSpeak Function
-      description: Recommends a movie and speaks it using Google Actions Webhooks
-      operationId: RecommendMovieAndSpeakFunction
+      summary: GoogleActions Function
+      description: Handles Google Actions Webhooks
+      operationId: GoogleActionsFunction
       produces:
         - application/json
       responses:
@@ -109,7 +109,7 @@ paths:
         type: aws_proxy
         httpMethod: POST
         uri: 
-          Fn::Sub: "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${RecommendMovieAndSpeakFunction.Arn}/invocations"
+          Fn::Sub: "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${GooleActionsFunction.Arn}/invocations"
 schemes:
   - https
 securityDefinitions:

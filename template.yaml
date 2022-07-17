@@ -150,13 +150,13 @@ Resources:
             Path: "/movies/recommend-movie"
             Method: get
 
-  RecommendMovieAndSpeakFunction:
+  GoogleActionsFunction:
     Type: AWS::Serverless::Function
     Properties:
-      FunctionName: !Sub "${ServiceName}-RecommendMovieAndSpeak"
+      FunctionName: !Sub "${ServiceName}-GoogleActions"
       Role: !GetAtt LambdaRole.Arn
       CodeUri: watch_wizard/
-      Handler: handlers/google_actions_handler.recommend_movie_and_speak
+      Handler: handlers/google_actions_handler.handle_response
       Environment:
         Variables:
           TraktSecretName: !Sub "apps/${ServiceName}-Trakt"
@@ -166,7 +166,7 @@ Resources:
           Properties:
             RestApiId:
               Ref: ApiGatewayApi
-            Path: "/movies/recommend-movie-and-speak"
+            Path: "/google-actions"
             Method: post
             Auth:
               ApiKeyRequired: false
