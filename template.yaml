@@ -67,7 +67,7 @@ Resources:
       UsagePlanName: !Sub "${ServiceName}-Default-Usage-Plan"
       ApiStages:
         - ApiId: !Ref ApiGatewayApi
-          Stage: Prod
+          Stage: !Ref ApiGatewayApi.Stage
       Description: !Sub "Default usage plan for the ${ServiceName} service"
       Quota:
         Limit: 5000
@@ -84,7 +84,7 @@ Resources:
       Enabled: True
       StageKeys:
         - RestApiId: !Ref ApiGatewayApi
-          StageName: Prod
+          StageName: !Ref ApiGatewayApi.Stage
 
   UsagePlanApiKey:
     Type: AWS::ApiGateway::UsagePlanKey
