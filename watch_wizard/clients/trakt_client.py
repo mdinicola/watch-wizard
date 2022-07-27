@@ -1,6 +1,7 @@
 from trakt import core
 from trakt import movies as trakt_movies
 from models.device_auth_data import DeviceAuthData
+from models.movie import Movie
 import logging
 import time
 import random
@@ -66,4 +67,5 @@ class TraktClient:
         return response
 
     def get_recommended_movie(self):
-        return random.choice(trakt_movies.get_recommended_movies())
+        trakt_movie = random.choice(trakt_movies.get_recommended_movies())
+        return Movie.from_trakt(trakt_movie)

@@ -51,15 +51,3 @@ def authenticate_device(event, context):
             "message": response['message']
         })
     }
-
-def recommend_movie(event, context):
-    movie = get_recommended_movie()
-    
-    return {
-        'statusCode': 200,
-        'body': json.dumps(movie, cls=EnhancedJSONEncoder)
-    }
-
-def get_recommended_movie():
-    trakt_client = TraktClient(AWS_SECRET_NAME)
-    return trakt_client.get_recommended_movie()
