@@ -24,6 +24,8 @@ Resources:
               Service: lambda.amazonaws.com
             Action:
               - sts:AssumeRole
+      ManagedPolicyArns:
+        - "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
       Policies:
         - PolicyName: !Sub "${ServiceName}-Lambda-Policy"
           PolicyDocument:
@@ -137,7 +139,7 @@ Resources:
       FunctionName: !Sub "${ServiceName}-RecommendMovie"
       Role: !GetAtt LambdaRole.Arn
       CodeUri: watch_wizard/
-      Handler: handlers/trakt_handler.recommend_movie
+      Handler: handlers/movies_handler.recommend_movie
       Environment:
         Variables:
           TraktSecretName: !Sub "apps/${ServiceName}-Trakt"
