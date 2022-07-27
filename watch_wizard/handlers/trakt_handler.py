@@ -16,6 +16,13 @@ def get_auth_code(event, context):
     secret = SecretsManagerSecret(client = boto3.client('secretsmanager'), secret_name = AWS_SECRET_NAME)
     client_id = secret.get_value(TRAKT_CLIENT_ID_KEY)
     client_secret = secret.get_value(TRAKT_CLIENT_SECRET_KEY)
+
+    if client_id == '' or client_secret == '':
+        return {
+            'statusCode': 500,
+            'body': json.dumps({'message': 'Trakt configuration is invalid or not set'})
+        }
+
     response = TraktClient.get_auth_code(client_id, client_secret)
 
     return {
