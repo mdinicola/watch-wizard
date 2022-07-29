@@ -10,10 +10,13 @@ TRAKT_CLIENT_SECRET_KEY = 'CLIENT_SECRET'
 
 _logger = logging.getLogger(__name__)
 
-def recommend_movie(event, context):
+def recommend_movie():
+    trakt_client = TraktClient(AWS_SECRET_NAME)
+    return trakt_client.get_recommended_movie()
+
+def recommend_movie_api_request(event, context):
     try:
-        trakt_client = TraktClient(AWS_SECRET_NAME)
-        movie = trakt_client.get_recommended_movie()
+        movie = recommend_movie()
    
         return {
             'statusCode': 200,
