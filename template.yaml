@@ -4,7 +4,7 @@ Description: SAM template for WatchWizard Application
 Globals:
   Function:
     Runtime: python3.9
-    Timeout: 30
+    Timeout: 60
     Environment:
       Variables:
         ServiceName: !Ref ServiceName
@@ -139,7 +139,7 @@ Resources:
       FunctionName: !Sub "${ServiceName}-RecommendMovie"
       Role: !GetAtt LambdaRole.Arn
       CodeUri: watch_wizard/
-      Handler: handlers/movies_handler.recommend_movie
+      Handler: handlers/movies_handler.recommend_movie_api_request
       Environment:
         Variables:
           TraktSecretName: !Sub "apps/${ServiceName}-Trakt"
@@ -172,3 +172,38 @@ Resources:
             Method: post
             Auth:
               ApiKeyRequired: false
+
+  AlexaSkillsApiFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub "${ServiceName}-AlexaSkillsApi"
+      Role: !GetAtt LambdaRole.Arn
+      CodeUri: watch_wizard/
+      Handler: handlers/alexa_skills_handler.handle_api_request
+      Environment:
+        Variables:
+          TraktSecretName: !Sub "apps/${ServiceName}-Trakt"
+      Events:
+        Post:
+          Type: Api
+          Properties:
+            RestApiId:
+              Ref: ApiGatewayApi
+            Path: "/alexa-skills"
+            Method: post
+            Auth:
+              ApiKeyRequired: false
+
+  AlexaSkillsFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub "${ServiceName}-AlexaSkills"
+      Role: !GetAtt LambdaRole.Arn
+      CodeUri: watch_wizard/
+      Handler: handlers/alexa_skills_handler.handle_skill_request
+      Environment:
+        Variables:
+          TraktSecretName: !Sub "apps/${ServiceName}-Trakt"
+      Events:
+        AlexaSkillEvent:
+          Type: AlexaSkill

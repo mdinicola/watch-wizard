@@ -110,6 +110,27 @@ paths:
         httpMethod: POST
         uri: 
           Fn::Sub: "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${GoogleActionsFunction.Arn}/invocations"
+  "/alexa-skills":
+    post:
+      summary: AlexaSkills Function
+      description: Handles Alexa Skills
+      operationId: AlexaSkillsFunction
+      produces:
+        - application/json
+      responses:
+        200:
+          description: Success
+        404:
+          description: Not found
+        500:
+          description: 500 Internal Server Error
+        503:
+          description: SERVICE UNAVAILABLE
+      x-amazon-apigateway-integration:
+        type: aws_proxy
+        httpMethod: POST
+        uri: 
+          Fn::Sub: "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${AlexaSkillsApiFunction.Arn}/invocations"
 schemes:
   - https
 securityDefinitions:
