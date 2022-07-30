@@ -161,6 +161,8 @@ sb.add_request_handler(IntentReflectorHandler()) # make sure IntentReflectorHand
 
 sb.add_exception_handler(CatchAllExceptionHandler())
 
+handle_skill_request = sb.lambda_handler()
+
 def handle_api_request(event, context):
     # skip verification if testing locally
     if environ.get('AWS_SAM_LOCAL') == 'true':
@@ -174,6 +176,3 @@ def handle_api_request(event, context):
         'statusCode': 200,
         'body': json.dumps(response)
     }
-
-def handle_skill_request(event, context):
-    sb.lambda_handler()
