@@ -51,8 +51,6 @@ Resources:
     Properties:
       StageName: Prod
       Name: !Sub "${ServiceName}-ApiGateway"
-      Auth:
-        ApiKeyRequired: true
       DefinitionBody:
         Fn::Transform:
           Name: AWS::Include
@@ -113,6 +111,8 @@ Resources:
               Ref: ApiGatewayApi
             Path: "/trakt/auth-code"
             Method: get
+            Auth:
+              ApiKeyRequired: true
 
   TraktAuthenticateDeviceFunction:
     Type: AWS::Serverless::Function
@@ -132,6 +132,8 @@ Resources:
               Ref: ApiGatewayApi
             Path: "/trakt/authenticate-device"
             Method: post
+            Auth:
+              ApiKeyRequired: true
 
   RecommendMovieFunction:
     Type: AWS::Serverless::Function
@@ -151,6 +153,8 @@ Resources:
               Ref: ApiGatewayApi
             Path: "/movies/recommend-movie"
             Method: get
+            Auth:
+              ApiKeyRequired: true
 
   GoogleActionsFunction:
     Type: AWS::Serverless::Function
