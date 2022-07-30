@@ -161,7 +161,9 @@ sb.add_request_handler(IntentReflectorHandler()) # make sure IntentReflectorHand
 
 sb.add_exception_handler(CatchAllExceptionHandler())
 
-handle_skill_requests = sb.lambda_handler()
+def handle_skill_request(event, context):
+    handler = sb.lambda_handler()
+    return handler(event, context)
 
 def handle_api_request(event, context):
     # skip verification if testing locally
