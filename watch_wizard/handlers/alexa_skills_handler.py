@@ -175,5 +175,5 @@ def handle_api_request(event, context):
         'body': json.dumps(response)
     }
 
-def handle_skill_request():
+def handle_skill_request(event, context):
     sb.lambda_handler()
