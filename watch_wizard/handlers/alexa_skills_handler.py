@@ -1,6 +1,4 @@
 from ask_sdk_core.dispatch_components import AbstractRequestHandler
-from ask_sdk_core.handler_input import HandlerInput
-from ask_sdk_model import Response
 from clients.aws_secrets_manager import SecretsManagerSecret
 from handlers import movies_handler
 from os import environ
@@ -13,17 +11,14 @@ import logging
 
 _logger = logging.getLogger(__name__)
 
-# Define Alexa request handler classes
+### Define Alexa request handler classes
 
 class LaunchRequestHandler(AbstractRequestHandler):
     """Handler for Skill Launch."""
-    def can_handle(self, handler_input):
-        # type: (HandlerInput) -> bool
-        
+    def can_handle(self, handler_input):       
         return ask_utils.is_request_type("LaunchRequest")(handler_input)
 
     def handle(self, handler_input):
-        # type: (HandlerInput) -> Response
         speak_output = "Welcome to the Watch Wizard. You can say 'recommend a movie'."
 
         return (
@@ -33,15 +28,12 @@ class LaunchRequestHandler(AbstractRequestHandler):
                 .response
         )
 
-
 class RecommendMovieIntentHandler(AbstractRequestHandler):
     """Handler for Recommend Movie Intent."""
     def can_handle(self, handler_input):
-        # type: (HandlerInput) -> bool
         return ask_utils.is_intent_name("RecommendMovieIntent")(handler_input)
 
     def handle(self, handler_input):
-        # type: (HandlerInput) -> Response
         movie = movies_handler.recommend_movie()
         message = movie.recommendation_message()
         speak_output = message
@@ -53,15 +45,12 @@ class RecommendMovieIntentHandler(AbstractRequestHandler):
                 .response
         )
 
-
 class HelpIntentHandler(AbstractRequestHandler):
     """Handler for Help Intent."""
     def can_handle(self, handler_input):
-        # type: (HandlerInput) -> bool
         return ask_utils.is_intent_name("AMAZON.HelpIntent")(handler_input)
 
     def handle(self, handler_input):
-        # type: (HandlerInput) -> Response
         speak_output = "You can ask me to recommend a movie"
 
         return (
@@ -71,7 +60,9 @@ class HelpIntentHandler(AbstractRequestHandler):
                 .response
         )
 
-# Functions start
+###############################
+
+### Lambda functions start
 
 _AWS_SECRET_NAME = environ['ServiceSecretName']
 _ALEXA_SKILL_ID_KEY = 'AlexaSkillId'

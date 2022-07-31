@@ -2,8 +2,6 @@ from ask_sdk_core.dispatch_components import AbstractRequestHandler
 from ask_sdk_core.dispatch_components import AbstractExceptionHandler
 from ask_sdk_webservice_support.webservice_handler import WebserviceSkillHandler
 from ask_sdk_core.skill_builder import SkillBuilder
-from ask_sdk_core.handler_input import HandlerInput
-from ask_sdk_model import Response
 from os import environ
 import ask_sdk_core.utils as ask_utils
 import logging
@@ -32,17 +30,15 @@ class AlexaClient:
         else:
             return WebserviceSkillHandler(skill=self._skill_builder.create())
 
-# Default Alexa request handlers
+### Default Alexa request handlers
 
 class CancelOrStopIntentHandler(AbstractRequestHandler):
     """Single handler for Cancel and Stop Intent."""
     def can_handle(self, handler_input):
-        # type: (HandlerInput) -> bool
         return (ask_utils.is_intent_name("AMAZON.CancelIntent")(handler_input) or
                 ask_utils.is_intent_name("AMAZON.StopIntent")(handler_input))
 
     def handle(self, handler_input):
-        # type: (HandlerInput) -> Response
         speak_output = "Goodbye!"
 
         return (
@@ -51,16 +47,12 @@ class CancelOrStopIntentHandler(AbstractRequestHandler):
                 .response
         )
 
-
 class SessionEndedRequestHandler(AbstractRequestHandler):
     """Handler for Session End."""
     def can_handle(self, handler_input):
-        # type: (HandlerInput) -> bool
         return ask_utils.is_request_type("SessionEndedRequest")(handler_input)
 
     def handle(self, handler_input):
-        # type: (HandlerInput) -> Response
-
         # Any cleanup logic goes here.
 
         return handler_input.response_builder.response
@@ -72,11 +64,9 @@ class IntentReflectorHandler(AbstractRequestHandler):
     handler chain below.
     """
     def can_handle(self, handler_input):
-        # type: (HandlerInput) -> bool
         return ask_utils.is_request_type("IntentRequest")(handler_input)
 
     def handle(self, handler_input):
-        # type: (HandlerInput) -> Response
         intent_name = ask_utils.get_intent_name(handler_input)
         speak_output = "You just triggered " + intent_name + "."
 
@@ -87,18 +77,15 @@ class IntentReflectorHandler(AbstractRequestHandler):
                 .response
         )
 
-
 class CatchAllExceptionHandler(AbstractExceptionHandler):
     """Generic error handling to capture any syntax or routing errors. If you receive an error
     stating the request handler chain is not found, you have not implemented a handler for
     the intent being invoked or included it in the skill builder below.
     """
     def can_handle(self, handler_input, exception):
-        # type: (HandlerInput, Exception) -> bool
         return True
 
     def handle(self, handler_input, exception):
-        # type: (HandlerInput, Exception) -> Response
         _logger.error(exception, exc_info=True)
 
         speak_output = "Sorry, I had trouble doing what you asked. Please try again."
