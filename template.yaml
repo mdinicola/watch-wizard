@@ -172,6 +172,7 @@ Resources:
       Handler: handlers/alexa_skills_handler.handle_api_request
       Environment:
         Variables:
+          ServiceSecretName: !Sub "apps/${ServiceName}"
           TraktSecretName: !Sub "apps/${ServiceName}-Trakt"
       Events:
         Post:
@@ -193,6 +194,7 @@ Resources:
       Handler: handlers/alexa_skills_handler.handle_skill_request
       Environment:
         Variables:
+          ServiceSecretName: !Sub "apps/${ServiceName}"
           TraktSecretName: !Sub "apps/${ServiceName}-Trakt"
       Events:
         AlexaSkillEvent:
