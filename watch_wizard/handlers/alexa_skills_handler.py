@@ -1,19 +1,19 @@
-from ask_sdk_core.skill_builder import SkillBuilder
-from ask_sdk_webservice_support.webservice_handler import WebserviceSkillHandler
 from ask_sdk_core.dispatch_components import AbstractRequestHandler
-from ask_sdk_core.dispatch_components import AbstractExceptionHandler
 from ask_sdk_core.handler_input import HandlerInput
 from ask_sdk_model import Response
 from clients.aws_secrets_manager import SecretsManagerSecret
 from handlers import movies_handler
-
 from os import environ
+
 import ask_sdk_core.utils as ask_utils
+from clients.alexa_client import AlexaClient, IntentReflectorHandler, CancelOrStopIntentHandler, SessionEndedRequestHandler, CatchAllExceptionHandler
 import boto3
 import json
 import logging
 
 _logger = logging.getLogger(__name__)
+
+# Define Alexa request handler classes
 
 class LaunchRequestHandler(AbstractRequestHandler):
     """Handler for Skill Launch."""
@@ -24,7 +24,7 @@ class LaunchRequestHandler(AbstractRequestHandler):
 
     def handle(self, handler_input):
         # type: (HandlerInput) -> Response
-        speak_output = "Welcome to the Watch Wizard. You can say 'recommend a movie'?"
+        speak_output = "Welcome to the Watch Wizard. You can say 'recommend a movie'."
 
         return (
             handler_input.response_builder
@@ -71,121 +71,34 @@ class HelpIntentHandler(AbstractRequestHandler):
                 .response
         )
 
-
-class CancelOrStopIntentHandler(AbstractRequestHandler):
-    """Single handler for Cancel and Stop Intent."""
-    def can_handle(self, handler_input):
-        # type: (HandlerInput) -> bool
-        return (ask_utils.is_intent_name("AMAZON.CancelIntent")(handler_input) or
-                ask_utils.is_intent_name("AMAZON.StopIntent")(handler_input))
-
-    def handle(self, handler_input):
-        # type: (HandlerInput) -> Response
-        speak_output = "Goodbye!"
-
-        return (
-            handler_input.response_builder
-                .speak(speak_output)
-                .response
-        )
-
-
-class SessionEndedRequestHandler(AbstractRequestHandler):
-    """Handler for Session End."""
-    def can_handle(self, handler_input):
-        # type: (HandlerInput) -> bool
-        return ask_utils.is_request_type("SessionEndedRequest")(handler_input)
-
-    def handle(self, handler_input):
-        # type: (HandlerInput) -> Response
-
-        # Any cleanup logic goes here.
-
-        return handler_input.response_builder.response
-
-class IntentReflectorHandler(AbstractRequestHandler):
-    """The intent reflector is used for interaction model testing and debugging.
-    It will simply repeat the intent the user said. You can create custom handlers
-    for your intents by defining them above, then also adding them to the request
-    handler chain below.
-    """
-    def can_handle(self, handler_input):
-        # type: (HandlerInput) -> bool
-        return ask_utils.is_request_type("IntentRequest")(handler_input)
-
-    def handle(self, handler_input):
-        # type: (HandlerInput) -> Response
-        intent_name = ask_utils.get_intent_name(handler_input)
-        speak_output = "You just triggered " + intent_name + "."
-
-        return (
-            handler_input.response_builder
-                .speak(speak_output)
-                # .ask("add a reprompt if you want to keep the session open for the user to respond")
-                .response
-        )
-
-
-class CatchAllExceptionHandler(AbstractExceptionHandler):
-    """Generic error handling to capture any syntax or routing errors. If you receive an error
-    stating the request handler chain is not found, you have not implemented a handler for
-    the intent being invoked or included it in the skill builder below.
-    """
-    def can_handle(self, handler_input, exception):
-        # type: (HandlerInput, Exception) -> bool
-        return True
-
-    def handle(self, handler_input, exception):
-        # type: (HandlerInput, Exception) -> Response
-        _logger.error(exception, exc_info=True)
-
-        speak_output = "Sorry, I had trouble doing what you asked. Please try again."
-
-        return (
-            handler_input.response_builder
-                .speak(speak_output)
-                .ask(speak_output)
-                .response
-        )
+# Functions start
 
 _AWS_SECRET_NAME = environ['ServiceSecretName']
 _ALEXA_SKILL_ID_KEY = 'AlexaSkillId'
-secret = SecretsManagerSecret(client = boto3.client('secretsmanager'), secret_name = _AWS_SECRET_NAME)
+_secretsmanager_client = boto3.client('secretsmanager')
 
-# The SkillBuilder object acts as the entry point for your skill, routing all request and response
-# payloads to the handlers above. Make sure any new handlers or interceptors you've
-# defined are included below. The order matters - they're processed top to bottom.
-
-_skill_builder = SkillBuilder()
-
-_skill_builder.add_request_handler(LaunchRequestHandler())
-_skill_builder.add_request_handler(RecommendMovieIntentHandler())
-_skill_builder.add_request_handler(HelpIntentHandler())
-_skill_builder.add_request_handler(CancelOrStopIntentHandler())
-_skill_builder.add_request_handler(SessionEndedRequestHandler())
-_skill_builder.add_request_handler(IntentReflectorHandler()) # make sure IntentReflectorHandler is last so it doesn't override your custom intent handlers
-
-_skill_builder.add_exception_handler(CatchAllExceptionHandler())
-
-def set_skill_id():
+# Configures and returns an AlexaClient
+def alexa_client():
+    secret = SecretsManagerSecret(_secretsmanager_client, secret_name = _AWS_SECRET_NAME)
     skill_id = secret.get_value(_ALEXA_SKILL_ID_KEY)
-    # SkillBuilder will verify the skill id matches the request from Alexa before routing to handlers
-    _skill_builder.skill_id = skill_id
+
+    # Creates AlexaClient and verifies configured skill_id matches incoming Alexa requests
+    alexa_client = AlexaClient(skill_id)
+
+    # make sure IntentReflectorHandler is last so it doesn't override your custom intent handlers
+    alexa_client.add_request_handlers([ LaunchRequestHandler(), RecommendMovieIntentHandler(), HelpIntentHandler(),
+                                        CancelOrStopIntentHandler(), SessionEndedRequestHandler(), IntentReflectorHandler() ])
+
+    alexa_client.add_exception_handler(CatchAllExceptionHandler())
+    return alexa_client
 
 def handle_skill_request(event, context):
-    set_skill_id()
-    handler = _skill_builder.lambda_handler()
+    handler = alexa_client().get_lambda_handler()
     return handler(event, context)
 
 def handle_api_request(event, context):
-    set_skill_id()
-    # skip verification if testing locally
-    if environ.get('AWS_SAM_LOCAL') == 'true':
-        webservice_handler = WebserviceSkillHandler(skill=_skill_builder.create(), verify_signature=False, verify_timestamp=False)
-    else:
-        webservice_handler = WebserviceSkillHandler(skill=_skill_builder.create())
-
-    response = webservice_handler.verify_request_and_dispatch(event['headers'], event['body'])
+    handler = alexa_client().get_webservice_handler()
+    response = handler.verify_request_and_dispatch(event['headers'], event['body'])
     
     return {
         'statusCode': 200,
