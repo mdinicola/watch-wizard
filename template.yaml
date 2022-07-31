@@ -39,6 +39,13 @@ Resources:
                 Resource:
                   - !Ref SecretsManagerTraktSecret
             
+  SecretsManagerSecret:
+    Type: AWS::SecretsManager::Secret
+    Properties:
+      Name: !Sub "apps/${ServiceName}"
+      Description: !Sub "Secret values for the ${ServiceName} application"
+      SecretString: '{"AlexaSkillId": ""}'
+
   SecretsManagerTraktSecret:
     Type: AWS::SecretsManager::Secret
     Properties:
@@ -172,7 +179,7 @@ Resources:
           Properties:
             RestApiId:
               Ref: ApiGatewayApi
-            Path: "/alexa-skills"
+            Path: "/alexa/skills"
             Method: post
             Auth:
               ApiKeyRequired: false

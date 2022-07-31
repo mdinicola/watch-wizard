@@ -89,7 +89,7 @@ paths:
           Fn::Sub: "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${RecommendMovieFunction.Arn}/invocations"
       security:
         - api_key: []
-  "/alexa-skills":
+  "/alexa/skills":
     post:
       summary: AlexaSkills Function
       description: Handles Alexa Skills
