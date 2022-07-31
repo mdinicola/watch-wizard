@@ -37,6 +37,7 @@ Resources:
                   - "secretsmanager:GetSecretValue"
                   - "secretsmanager:PutSecretValue"
                 Resource:
+                  - !Ref SecretsManagerSecret
                   - !Ref SecretsManagerTraktSecret
             
   SecretsManagerSecret:
