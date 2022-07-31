@@ -65,7 +65,7 @@ class HelpIntentHandler(AbstractRequestHandler):
 ### Lambda functions start
 
 _AWS_SECRET_NAME = environ['ServiceSecretName']
-_ALEXA_SKILL_ID_KEY = 'AlexaSkillId'
+_ALEXA_SKILL_ID_KEY = 'ALEXA_SKILL_ID'
 _secretsmanager_client = boto3.client('secretsmanager')
 
 # Configures and returns an AlexaClient

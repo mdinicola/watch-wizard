@@ -44,7 +44,7 @@ Resources:
     Properties:
       Name: !Sub "apps/${ServiceName}"
       Description: !Sub "Secret values for the ${ServiceName} application"
-      SecretString: '{"AlexaSkillId": ""}'
+      SecretString: '{"ALEXA_SKILL_ID": ""}'
 
   SecretsManagerTraktSecret:
     Type: AWS::SecretsManager::Secret
