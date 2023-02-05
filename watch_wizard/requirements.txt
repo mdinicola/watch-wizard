@@ -1,4 +1,4 @@
 boto3==1.21.46
 ask-sdk==1.17.1
 ask-sdk-webservice-support==1.3.3
-git+https://github.com/mdinicola/PyTrakt.git@8dc3d60bac1edc01e4fd3ce8555356062f53bda1#egg=trakt
+git+https://github.com/mdinicola/PyTrakt.git@aws-and-unwatched#egg=trakt

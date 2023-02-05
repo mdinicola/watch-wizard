@@ -1,9 +1,18 @@
+from os import environ
 import json
 import logging
+import boto3
 
 _logger = logging.getLogger(__name__)
 
 class SecretsManagerSecret:
+
+    @staticmethod
+    def get_client():
+        secretsManagerEndpoint = environ.get('SecretsManagerEndpoint')
+        if secretsManagerEndpoint != '':
+            return boto3.client('secretsmanager', endpoint_url = secretsManagerEndpoint)
+        return boto3.client('secretsmanager')
 
     def __init__(self, client, secret_name):
         self._client = client
@@ -26,14 +35,11 @@ class SecretsManagerSecret:
             _logger.exception(f'Could not get secret value for {self.secret_name} with error {e}')
             raise
 
-    def get_value(self, key):
+    def get_value(self, key, default_value = None):
         if self._secret is None:
             self._get_secret()
         
-        if key not in self._secret:
-            _logger.exception(f'Could not find key {key} in secret {self.secret_name}')
-            raise KeyError
-        return self._secret.get(key)
+        return self._secret.get(key, default_value)
 
     def put_values(self, **kwargs):
         if self._secret is None:

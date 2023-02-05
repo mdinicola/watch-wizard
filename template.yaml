@@ -8,6 +8,7 @@ Globals:
     Environment:
       Variables:
         ServiceName: !Ref ServiceName
+        SecretsManagerEndpoint: ""
 Parameters:
   ServiceName:
     Type: String

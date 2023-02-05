@@ -9,9 +9,11 @@ import random
 _logger = logging.getLogger(__name__)
 
 class TraktClient:
-    def __init__(self, aws_secret_name):
+    def __init__(self, aws_secret_name, aws_secrets_manager_endpoint = 'None'):
         core.CONFIG_TYPE = 'AWS_SECRETS_MANAGER'
         core.CONFIG_SECRET_NAME = aws_secret_name
+        if aws_secrets_manager_endpoint != '':
+            core.AWS_SECRETS_MANAGER_ENDPOINT = aws_secrets_manager_endpoint
         core.load_config()
 
     @staticmethod

@@ -5,13 +5,14 @@ import json
 import logging
 
 AWS_SECRET_NAME = environ['TraktSecretName']
+AWS_SECRETS_MANAGER_ENDPOINT = environ['SecretsManagerEndpoint']
 TRAKT_CLIENT_ID_KEY = 'CLIENT_ID'
 TRAKT_CLIENT_SECRET_KEY = 'CLIENT_SECRET'
 
 _logger = logging.getLogger(__name__)
 
 def recommend_movie():
-    trakt_client = TraktClient(AWS_SECRET_NAME)
+    trakt_client = TraktClient(AWS_SECRET_NAME, AWS_SECRETS_MANAGER_ENDPOINT)
     return trakt_client.get_recommended_movie()
 
 def recommend_movie_api_request(event, context):
