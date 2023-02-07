@@ -34,10 +34,13 @@ class TraktService:
         }
 
     @staticmethod
-    def authenticate_device(device_code: str, poll_interval: int, aws_secret_name: str):
+    def authenticate_device(device_code: str, poll_interval: int, aws_secret_name: str, aws_secrets_manager_endpoint = ''):
 
         core.CONFIG_TYPE = 'AWS_SECRETS_MANAGER'
         core.CONFIG_SECRET_NAME = aws_secret_name
+        if aws_secrets_manager_endpoint != '':
+            core.AWS_SECRETS_MANAGER_ENDPOINT = aws_secrets_manager_endpoint
+        
         core.load_config()
 
         success_message = "You've been successfully authenticated."

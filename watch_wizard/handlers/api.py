@@ -52,7 +52,7 @@ def authenticate_device(event, context):
             })
         }
 
-    response = TraktService.authenticate_device(device_code, poll_interval, AWS_SECRET_NAME)
+    response = TraktService.authenticate_device(device_code, poll_interval, AWS_SECRET_NAME, AWS_SECRETS_MANAGER_ENDPOINT)
 
     return {
         'statusCode': response['status_code'],
