@@ -18,3 +18,9 @@ class Movie:
     def recommendation_message(self):
         return f'You should watch {self.title} ({self.year})'
 
+class MovieService:
+    def __init__(self, service):
+        self._service = service
+
+    def recommend_movie(self):
+        return self._service.get_recommended_movie()

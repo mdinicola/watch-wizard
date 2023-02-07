@@ -1,21 +1,24 @@
 from ask_sdk_core.dispatch_components import AbstractRequestHandler
-from clients.aws_secrets_manager import SecretsManagerSecret
-from handlers import movies_handler
-from os import environ
-
+from services.aws_secrets_manager import SecretsManagerService
+from services.trakt import TraktService
+from services.movies import MovieService
+from services.alexa import AlexaService, IntentReflectorHandler, CancelOrStopIntentHandler, SessionEndedRequestHandler, CatchAllExceptionHandler
 import ask_sdk_core.utils as ask_utils
-from clients.alexa_client import AlexaClient, IntentReflectorHandler, CancelOrStopIntentHandler, SessionEndedRequestHandler, CatchAllExceptionHandler
+import os
 import boto3
 import json
 import logging
 
 _logger = logging.getLogger(__name__)
 
+AWS_SECRET_NAME = os.environ['TraktSecretName']
+AWS_SECRETS_MANAGER_ENDPOINT = os.environ['SecretsManagerEndpoint']
+
 ### Define Alexa request handler classes
 
 class LaunchRequestHandler(AbstractRequestHandler):
     """Handler for Skill Launch."""
-    def can_handle(self, handler_input):       
+    def can_handle(self, handler_input):
         return ask_utils.is_request_type("LaunchRequest")(handler_input)
 
     def handle(self, handler_input):
@@ -34,7 +37,8 @@ class RecommendMovieIntentHandler(AbstractRequestHandler):
         return ask_utils.is_intent_name("RecommendMovieIntent")(handler_input)
 
     def handle(self, handler_input):
-        movie = movies_handler.recommend_movie()
+        trakt_client = TraktService(AWS_SECRET_NAME, AWS_SECRETS_MANAGER_ENDPOINT)
+        movie = MovieService(trakt_client).recommend_movie()
         message = movie.recommendation_message()
         speak_output = message
 
@@ -64,17 +68,16 @@ class HelpIntentHandler(AbstractRequestHandler):
 
 ### Lambda functions start
 
-_AWS_SECRET_NAME = environ['ServiceSecretName']
+_AWS_SECRET_NAME = os.environ['ServiceSecretName']
 _ALEXA_SKILL_ID_KEY = 'ALEXA_SKILL_ID'
-_secretsmanager_client = boto3.client('secretsmanager')
 
 # Configures and returns an AlexaClient
 def alexa_client():
-    secret = SecretsManagerSecret(_secretsmanager_client, secret_name = _AWS_SECRET_NAME)
+    secret = SecretsManagerService(client = SecretsManagerService.get_client(), secret_name = _AWS_SECRET_NAME)
     skill_id = secret.get_value(_ALEXA_SKILL_ID_KEY)
 
     # Creates AlexaClient and verifies configured skill_id matches incoming Alexa requests
-    alexa_client = AlexaClient(skill_id)
+    alexa_client = AlexaService(skill_id)
 
     # make sure IntentReflectorHandler is last so it doesn't override your custom intent handlers
     alexa_client.add_request_handlers([ LaunchRequestHandler(), RecommendMovieIntentHandler(), HelpIntentHandler(),
@@ -86,12 +89,3 @@ def alexa_client():
 def handle_skill_request(event, context):
     handler = alexa_client().get_lambda_handler()
     return handler(event, context)
-
-def handle_api_request(event, context):
-    handler = alexa_client().get_webservice_handler()
-    response = handler.verify_request_and_dispatch(event['headers'], event['body'])
-    
-    return {
-        'statusCode': 200,
-        'body': json.dumps(response)
-    }

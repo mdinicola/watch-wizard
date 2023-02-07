@@ -8,6 +8,8 @@ Globals:
     Environment:
       Variables:
         ServiceName: !Ref ServiceName
+        ServiceSecretName: !Sub "apps/${ServiceName}"
+        TraktSecretName: !Sub "apps/${ServiceName}-Trakt"
         SecretsManagerEndpoint: ""
 Parameters:
   ServiceName:
@@ -102,47 +104,47 @@ Resources:
       KeyType: 'API_KEY'
       UsagePlanId: !Ref UsagePlan
 
-  TraktGetAuthCodeFunction:
-    Type: AWS::Serverless::Function
-    Properties:
-      FunctionName: !Sub "${ServiceName}-Trakt-GetAuthCode"
-      Role: !GetAtt LambdaRole.Arn
-      CodeUri: watch_wizard/
-      Handler: handlers/trakt_handler.get_auth_code
-      Environment:
-        Variables:
-          TraktSecretName: !Sub "apps/${ServiceName}-Trakt"
-      Events:
-        Get:
-          Type: Api
-          Properties:
-            RestApiId:
-              Ref: ApiGatewayApi
-            Path: "/trakt/auth-code"
-            Method: get
-            Auth:
-              ApiKeyRequired: true
+  # TraktGetAuthCodeFunction:
+  #   Type: AWS::Serverless::Function
+  #   Properties:
+  #     FunctionName: !Sub "${ServiceName}-Trakt-GetAuthCode"
+  #     Role: !GetAtt LambdaRole.Arn
+  #     CodeUri: watch_wizard/
+  #     Handler: handlers/api.get_auth_code
+  #     Environment:
+  #       Variables:
+  #         TraktSecretName: !Sub "apps/${ServiceName}-Trakt"
+  #     Events:
+  #       Get:
+  #         Type: Api
+  #         Properties:
+  #           RestApiId:
+  #             Ref: ApiGatewayApi
+  #           Path: "/trakt/auth-code"
+  #           Method: get
+  #           Auth:
+  #             ApiKeyRequired: true
 
-  TraktAuthenticateDeviceFunction:
-    Type: AWS::Serverless::Function
-    Properties:
-      FunctionName: !Sub "${ServiceName}-Trakt-AuthenticateDevice"
-      Role: !GetAtt LambdaRole.Arn
-      CodeUri: watch_wizard/
-      Handler: handlers/trakt_handler.authenticate_device
-      Environment:
-        Variables:
-          TraktSecretName: !Sub "apps/${ServiceName}-Trakt"
-      Events:
-        Get:
-          Type: Api
-          Properties:
-            RestApiId:
-              Ref: ApiGatewayApi
-            Path: "/trakt/authenticate-device"
-            Method: post
-            Auth:
-              ApiKeyRequired: true
+  # TraktAuthenticateDeviceFunction:
+  #   Type: AWS::Serverless::Function
+  #   Properties:
+  #     FunctionName: !Sub "${ServiceName}-Trakt-AuthenticateDevice"
+  #     Role: !GetAtt LambdaRole.Arn
+  #     CodeUri: watch_wizard/
+  #     Handler: handlers/api.authenticate_device
+  #     Environment:
+  #       Variables:
+  #         TraktSecretName: !Sub "apps/${ServiceName}-Trakt"
+  #     Events:
+  #       Get:
+  #         Type: Api
+  #         Properties:
+  #           RestApiId:
+  #             Ref: ApiGatewayApi
+  #           Path: "/trakt/authenticate-device"
+  #           Method: post
+  #           Auth:
+  #             ApiKeyRequired: true
 
   RecommendMovieFunction:
     Type: AWS::Serverless::Function
@@ -150,10 +152,7 @@ Resources:
       FunctionName: !Sub "${ServiceName}-RecommendMovie"
       Role: !GetAtt LambdaRole.Arn
       CodeUri: watch_wizard/
-      Handler: handlers/movies_handler.recommend_movie_api_request
-      Environment:
-        Variables:
-          TraktSecretName: !Sub "apps/${ServiceName}-Trakt"
+      Handler: handlers/api.recommend_movie
       Events:
         Get:
           Type: Api
@@ -171,11 +170,7 @@ Resources:
       FunctionName: !Sub "${ServiceName}-AlexaSkillsApi"
       Role: !GetAtt LambdaRole.Arn
       CodeUri: watch_wizard/
-      Handler: handlers/alexa_skills_handler.handle_api_request
-      Environment:
-        Variables:
-          ServiceSecretName: !Sub "apps/${ServiceName}"
-          TraktSecretName: !Sub "apps/${ServiceName}-Trakt"
+      Handler: handlers/api.handle_alexa_skill_request
       Events:
         Post:
           Type: Api
@@ -187,17 +182,17 @@ Resources:
             Auth:
               ApiKeyRequired: false
 
-  AlexaSkillsFunction:
-    Type: AWS::Serverless::Function
-    Properties:
-      FunctionName: !Sub "${ServiceName}-AlexaSkills"
-      Role: !GetAtt LambdaRole.Arn
-      CodeUri: watch_wizard/
-      Handler: handlers/alexa_skills_handler.handle_skill_request
-      Environment:
-        Variables:
-          ServiceSecretName: !Sub "apps/${ServiceName}"
-          TraktSecretName: !Sub "apps/${ServiceName}-Trakt"
-      Events:
-        AlexaSkillEvent:
-          Type: AlexaSkill
+  # AlexaSkillsFunction:
+  #   Type: AWS::Serverless::Function
+  #   Properties:
+  #     FunctionName: !Sub "${ServiceName}-AlexaSkills"
+  #     Role: !GetAtt LambdaRole.Arn
+  #     CodeUri: watch_wizard/
+  #     Handler: handlers/alexa.handle_skill_request
+  #     Environment:
+  #       Variables:
+  #         ServiceSecretName: !Sub "apps/${ServiceName}"
+  #         TraktSecretName: !Sub "apps/${ServiceName}-Trakt"
+  #     Events:
+  #       AlexaSkillEvent:
+  #         Type: AlexaSkill

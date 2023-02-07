@@ -5,7 +5,7 @@ import boto3
 
 _logger = logging.getLogger(__name__)
 
-class SecretsManagerSecret:
+class SecretsManagerService:
 
     @staticmethod
     def get_client():

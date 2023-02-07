@@ -8,7 +8,7 @@ import logging
 
 _logger = logging.getLogger(__name__)
 
-class AlexaClient:
+class AlexaService:
     def __init__(self, skill_id):
         self._skill_builder = SkillBuilder()
         self._skill_builder.skill_id = skill_id

@@ -1,15 +1,22 @@
 from trakt import core
 from trakt import movies as trakt_movies
-from models.device_auth_data import DeviceAuthData
-from models.movie import Movie
+from services.movies import Movie
+from dataclasses import dataclass
 import logging
 import time
 import random
 
 _logger = logging.getLogger(__name__)
 
-class TraktClient:
-    def __init__(self, aws_secret_name, aws_secrets_manager_endpoint = 'None'):
+@dataclass
+class DeviceAuthData:
+    user_code: str
+    device_code: str
+    verification_url: str
+    poll_interval: int
+
+class TraktService:
+    def __init__(self, aws_secret_name, aws_secrets_manager_endpoint = ''):
         core.CONFIG_TYPE = 'AWS_SECRETS_MANAGER'
         core.CONFIG_SECRET_NAME = aws_secret_name
         if aws_secrets_manager_endpoint != '':
