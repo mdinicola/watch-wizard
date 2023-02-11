@@ -2,7 +2,7 @@ from utils.enhanced_json_encoder import EnhancedJSONEncoder
 from services.trakt import TraktService
 from services.aws_secrets_manager import SecretsManagerService
 from services.movies import MovieService
-from handlers.alexa import handle_skill_request
+from handlers.alexa import alexa_service
 import os
 import json
 import logging
@@ -80,7 +80,8 @@ def recommend_movie(event, context):
         }
     
 def handle_alexa_skill_request(event, context):
-    response = handle_skill_request(event['headers'], event['body'])
+    handler = alexa_service().get_webservice_handler()
+    response = handler.verify_request_and_dispatch(event['headers'], event['body'])
    
     return {
         'statusCode': 200,

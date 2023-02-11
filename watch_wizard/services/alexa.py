@@ -2,7 +2,7 @@ from ask_sdk_core.dispatch_components import AbstractRequestHandler
 from ask_sdk_core.dispatch_components import AbstractExceptionHandler
 from ask_sdk_webservice_support.webservice_handler import WebserviceSkillHandler
 from ask_sdk_core.skill_builder import SkillBuilder
-from os import environ
+import os
 import ask_sdk_core.utils as ask_utils
 import logging
 
@@ -25,7 +25,7 @@ class AlexaService:
 
     def get_webservice_handler(self):
         # skip verification if testing locally
-        if environ.get('AWS_SAM_LOCAL') == 'true':
+        if os.environ.get('AWS_SAM_LOCAL') == 'true':
             return WebserviceSkillHandler(skill=self._skill_builder.create(), verify_signature=False, verify_timestamp=False)
         else:
             return WebserviceSkillHandler(skill=self._skill_builder.create())

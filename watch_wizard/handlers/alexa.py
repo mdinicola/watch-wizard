@@ -2,11 +2,9 @@ from ask_sdk_core.dispatch_components import AbstractRequestHandler
 from services.aws_secrets_manager import SecretsManagerService
 from services.trakt import TraktService
 from services.movies import MovieService
-from services.alexa import AlexaService, IntentReflectorHandler, CancelOrStopIntentHandler, SessionEndedRequestHandler, CatchAllExceptionHandler
+import services.alexa as alexa
 import ask_sdk_core.utils as ask_utils
 import os
-import boto3
-import json
 import logging
 
 _logger = logging.getLogger(__name__)
@@ -68,24 +66,20 @@ class HelpIntentHandler(AbstractRequestHandler):
 
 ### Lambda functions start
 
-_AWS_SECRET_NAME = os.environ['ServiceSecretName']
-_ALEXA_SKILL_ID_KEY = 'ALEXA_SKILL_ID'
+_ALEXA_SKILL_ID = os.environ.get('AlexaSkillId')
 
-# Configures and returns an AlexaClient
-def alexa_client():
-    secret = SecretsManagerService(client = SecretsManagerService.get_client(), secret_name = _AWS_SECRET_NAME)
-    skill_id = secret.get_value(_ALEXA_SKILL_ID_KEY)
-
+# Configures and returns an AlexaService
+def alexa_service():
     # Creates AlexaClient and verifies configured skill_id matches incoming Alexa requests
-    alexa_client = AlexaService(skill_id)
+    alexa_service = alexa.AlexaService(_ALEXA_SKILL_ID)
 
     # make sure IntentReflectorHandler is last so it doesn't override your custom intent handlers
-    alexa_client.add_request_handlers([ LaunchRequestHandler(), RecommendMovieIntentHandler(), HelpIntentHandler(),
-                                        CancelOrStopIntentHandler(), SessionEndedRequestHandler(), IntentReflectorHandler() ])
+    alexa_service.add_request_handlers([ LaunchRequestHandler(), RecommendMovieIntentHandler(), HelpIntentHandler(),
+                                        alexa.CancelOrStopIntentHandler(), alexa.SessionEndedRequestHandler(), alexa.IntentReflectorHandler() ])
 
-    alexa_client.add_exception_handler(CatchAllExceptionHandler())
-    return alexa_client
+    alexa_service.add_exception_handler(alexa.CatchAllExceptionHandler())
+    return alexa_service
 
 def handle_skill_request(event, context):
-    handler = alexa_client().get_lambda_handler()
+    handler = alexa_service().get_lambda_handler()
     return handler(event, context)
