@@ -1,4 +1,4 @@
-from os import environ
+import os
 import json
 import logging
 import boto3
@@ -9,11 +9,25 @@ class SecretsManagerService:
 
     @staticmethod
     def get_client():
-        secretsManagerEndpoint = environ.get('SecretsManagerEndpoint')
+        secretsManagerEndpoint = os.environ.get('SecretsManagerEndpoint')
         if secretsManagerEndpoint != '':
             return boto3.client('secretsmanager', endpoint_url = secretsManagerEndpoint)
-        return boto3.client('secretsmanager')
+        return boto3.client('secretsmanager'), secretsManagerEndpoint
 
+    def __init__(self, client = None):
+        self.client = client
+        if self.client is None:
+            self.client = SecretsManagerService.get_client()
+        self.secrets_manager_endpoint = os.environ.get('SecretsManagerEndpoint')
+        self._secret = None
+
+    def set_client(self, client):
+        self.client = client
+
+    def get_secret(self, secret_name):
+        return SecretsManagerSecret(self.client, secret_name)
+
+class SecretsManagerSecret:
     def __init__(self, client, secret_name):
         self._client = client
         self.secret_name = secret_name
