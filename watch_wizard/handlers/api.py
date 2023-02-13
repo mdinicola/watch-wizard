@@ -1,25 +1,19 @@
 from utils.enhanced_json_encoder import EnhancedJSONEncoder
+from services.config import ConfigService
 from services.trakt import TraktService
-from services.aws_secrets_manager import SecretsManagerService
 from services.movies import MovieService
 from handlers.alexa import alexa_service
-import os
 import json
 import logging
 
 _logger = logging.getLogger(__name__)
-
-AWS_SECRET_NAME = os.environ['TraktSecretName']
-AWS_SECRETS_MANAGER_ENDPOINT = os.environ['SecretsManagerEndpoint']
-TRAKT_CLIENT_ID_KEY = 'CLIENT_ID'
-TRAKT_CLIENT_SECRET_KEY = 'CLIENT_SECRET'
+_config_service = ConfigService.load_config()
 
 def get_auth_code(event, context):
-    secret = SecretsManagerService(client = SecretsManagerService.get_client(), secret_name = AWS_SECRET_NAME)
-    client_id = secret.get_value(TRAKT_CLIENT_ID_KEY)
-    client_secret = secret.get_value(TRAKT_CLIENT_SECRET_KEY)
+    client_id = _config_service.trakt_config.get('client_id')
+    client_secret = _config_service.trakt_config.get('client_secret')
 
-    if client_id == '' or client_secret == '':
+    if client_id is None or client_secret is None:
         return {
             'statusCode': 500,
             'body': json.dumps({'message': 'Trakt configuration is invalid or not set'})
@@ -52,7 +46,8 @@ def authenticate_device(event, context):
             })
         }
 
-    response = TraktService.authenticate_device(device_code, poll_interval, AWS_SECRET_NAME, AWS_SECRETS_MANAGER_ENDPOINT)
+    response = TraktService.authenticate_device(device_code, poll_interval, _config_service.trakt_config.get('secret_name'), 
+                                                    _config_service.config.get('secrets_manager_endpoint'))
 
     return {
         'statusCode': response['status_code'],
@@ -63,7 +58,8 @@ def authenticate_device(event, context):
 
 def recommend_movie(event, context):
     try:
-        trakt_client = TraktService(AWS_SECRET_NAME, AWS_SECRETS_MANAGER_ENDPOINT)
+        trakt_client = TraktService(_config_service.trakt_config.get('secret_name'), 
+                                    _config_service.config.get('secrets_manager_endpoint'))
         movie = MovieService(trakt_client).recommend_movie()
    
         return {

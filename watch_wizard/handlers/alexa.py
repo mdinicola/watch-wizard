@@ -1,5 +1,5 @@
 from ask_sdk_core.dispatch_components import AbstractRequestHandler
-from services.aws_secrets_manager import SecretsManagerService
+from services.config import ConfigService
 from services.trakt import TraktService
 from services.movies import MovieService
 import services.alexa as alexa
@@ -8,9 +8,7 @@ import os
 import logging
 
 _logger = logging.getLogger(__name__)
-
-AWS_SECRET_NAME = os.environ['TraktSecretName']
-AWS_SECRETS_MANAGER_ENDPOINT = os.environ['SecretsManagerEndpoint']
+_config_service = ConfigService.load_config()
 
 ### Define Alexa request handler classes
 
@@ -35,7 +33,7 @@ class RecommendMovieIntentHandler(AbstractRequestHandler):
         return ask_utils.is_intent_name("RecommendMovieIntent")(handler_input)
 
     def handle(self, handler_input):
-        trakt_client = TraktService(AWS_SECRET_NAME, AWS_SECRETS_MANAGER_ENDPOINT)
+        trakt_client = TraktService(_config_service.trakt_config.get('secret_name'), _config_service.config.get('secrets_manager_endpoint'))
         movie = MovieService(trakt_client).recommend_movie()
         message = movie.recommendation_message()
         speak_output = message
@@ -66,12 +64,10 @@ class HelpIntentHandler(AbstractRequestHandler):
 
 ### Lambda functions start
 
-_ALEXA_SKILL_ID = os.environ.get('AlexaSkillId')
-
 # Configures and returns an AlexaService
 def alexa_service():
     # Creates AlexaClient and verifies configured skill_id matches incoming Alexa requests
-    alexa_service = alexa.AlexaService(_ALEXA_SKILL_ID)
+    alexa_service = alexa.AlexaService(_config_service.alexa_config.get('skill_id'))
 
     # make sure IntentReflectorHandler is last so it doesn't override your custom intent handlers
     alexa_service.add_request_handlers([ LaunchRequestHandler(), RecommendMovieIntentHandler(), HelpIntentHandler(),
