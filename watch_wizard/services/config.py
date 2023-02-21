@@ -4,21 +4,39 @@ import logging
 
 _logger = logging.getLogger(__name__)
 _TRAKT_SECRET_NAME_KEY = 'TraktSecretName'
+_APP_SECRET_NAME_KEY = 'ServiceSecretName'
 _ALEXA_SKILL_ID_KEY = 'AlexaSkillId'
 
 class ConfigService:
     _secrets_manager_service = SecretsManagerService()
 
-    def __init__(self, config: dict, trakt_config: dict, alexa_config: dict):
+    def __init__(self, config: dict, trakt_config: dict, plex_config: dict, alexa_config: dict):
             self.config = config
             self.trakt_config = trakt_config
+            self.plex_config = plex_config
             self.alexa_config = alexa_config
+
+    def load_plex_credentials(self):
+        app_secret_name = os.environ[_APP_SECRET_NAME_KEY]
+        app_secret = ConfigService._secrets_manager_service.get_secret(app_secret_name)
+        self.plex_config['username'] = app_secret.get_value('PlexUsername')
+        self.plex_config['password'] = app_secret.get_value('PlexPassword')
+
+    def save_plex_config(self, token: str):
+        app_secret_name = os.environ[_APP_SECRET_NAME_KEY]
+        app_secret = ConfigService._secrets_manager_service.get_secret(app_secret_name)
+        self.plex_config['token'] = token
+        app_secret.put_values(PlexToken = token)
 
     @classmethod
     def load_config(cls):
         config = {
              'secrets_manager_endpoint': ConfigService._secrets_manager_service.secrets_manager_endpoint
         }
+
+        app_secret_name = os.environ[_APP_SECRET_NAME_KEY]
+        app_secret = ConfigService._secrets_manager_service.get_secret(app_secret_name)
+
         trakt_secret_name = os.environ[_TRAKT_SECRET_NAME_KEY]
         trakt_secret = ConfigService._secrets_manager_service.get_secret(trakt_secret_name)
         trakt_config = {
@@ -29,7 +47,13 @@ class ConfigService:
             'oauth_refresh': trakt_secret.get_value('OAUTH_REFRESH'),
             'oauth_expires_at': trakt_secret.get_value('OAUTH_EXPIRES_AT')
         }
+        
+        plex_config = {
+             'server_name': app_secret.get_value('PlexServerName'),
+             'token': app_secret.get_value('PlexToken')
+        }
+        
         alexa_config = {
              'skill_id': os.environ[_ALEXA_SKILL_ID_KEY]
         }
-        return cls(config, trakt_config, alexa_config)
+        return cls(config, trakt_config, plex_config, alexa_config)
