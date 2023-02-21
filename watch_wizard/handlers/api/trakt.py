@@ -1,8 +1,6 @@
 from utils.enhanced_json_encoder import EnhancedJSONEncoder
 from services.config import ConfigService
 from services.trakt import TraktService
-from services.movies import MovieService
-from handlers.alexa import alexa_service
 import json
 import logging
 
@@ -54,32 +52,4 @@ def authenticate_device(event, context):
         'body': json.dumps({
             "message": response['message']
         })
-    }
-
-def recommend_movie(event, context):
-    try:
-        trakt_client = TraktService(_config_service.trakt_config.get('secret_name'), 
-                                    _config_service.config.get('secrets_manager_endpoint'))
-        movie = MovieService(trakt_client).recommend_movie()
-   
-        return {
-            'statusCode': 200,
-            'body': json.dumps(movie, cls=EnhancedJSONEncoder)
-        }
-
-    except Exception as e:
-        _logger.exception(e)
-        message = 'An unexpected error ocurred.  See log for details'
-        return {
-            'statusCode': 500,
-            'body': json.dumps({'message': message})
-        }
-    
-def handle_alexa_skill_request(event, context):
-    handler = alexa_service().get_webservice_handler()
-    response = handler.verify_request_and_dispatch(event['headers'], event['body'])
-   
-    return {
-        'statusCode': 200,
-        'body': json.dumps(response)
     }
