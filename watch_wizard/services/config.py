@@ -16,18 +16,6 @@ class ConfigService:
             self.plex_config = plex_config
             self.alexa_config = alexa_config
 
-    def load_plex_credentials(self):
-        app_secret_name = os.environ[_APP_SECRET_NAME_KEY]
-        app_secret = ConfigService._secrets_manager_service.get_secret(app_secret_name)
-        self.plex_config['username'] = app_secret.get_value('PlexUsername')
-        self.plex_config['password'] = app_secret.get_value('PlexPassword')
-
-    def save_plex_config(self, token: str):
-        app_secret_name = os.environ[_APP_SECRET_NAME_KEY]
-        app_secret = ConfigService._secrets_manager_service.get_secret(app_secret_name)
-        self.plex_config['token'] = token
-        app_secret.put_values(PlexToken = token)
-
     @classmethod
     def load_config(cls):
         config = {
@@ -49,8 +37,9 @@ class ConfigService:
         }
         
         plex_config = {
-             'server_name': app_secret.get_value('PlexServerName'),
-             'token': app_secret.get_value('PlexToken')
+             'username': app_secret.get_value('PlexUsername'),
+             'password': app_secret.get_value('PlexPassword'),
+             'server_name': app_secret.get_value('PlexServerName')
         }
         
         alexa_config = {

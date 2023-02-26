@@ -66,26 +66,16 @@ paths:
           Fn::Sub: "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${TraktAuthenticateDeviceFunction.Arn}/invocations"
       security:
         - api_key: []
-  "/plex/authenticate":
-    post:
-      summary: Plex Authenticate Function
-      description: Authenticates Plex and updates API token
-      operationId: PlexAuthenticateFunction
-      consumes:
-        - application/json
+  "/plex/health":
+    get:
+      summary: Plex HealthCheck Function
+      description: Validates connection to Plex with the configured token
+      operationId: PlexHealthCheckFunction
       produces:
         - application/json
-      parameters:
-        - in: body
-          name: tfa_code
-          description: The TFA code for authenticating with Plex
-          schema:
-            $ref: "#/definitions/TfaCode"
       responses:
         200:
           description: Success
-        401:
-          description: Unauthorized
         404:
           description: Not found
         500:
@@ -96,7 +86,7 @@ paths:
         type: aws_proxy
         httpMethod: POST
         uri: 
-          Fn::Sub: "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${PlexAuthenticateFunction.Arn}/invocations"
+          Fn::Sub: "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${PlexHealthCheckFunction.Arn}/invocations"
       security:
         - api_key: []
   "/movies/recommend-movie":
@@ -165,11 +155,4 @@ definitions:
       user_code:
         type: string
       verification_url:
-        type: string
-  TfaCode:
-    type: object
-    required:
-      - code
-    properties:
-      code:
         type: string

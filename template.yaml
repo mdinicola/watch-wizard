@@ -49,7 +49,7 @@ Resources:
     Properties:
       Name: !Sub "apps/${ServiceName}"
       Description: !Sub "Secret values for the ${ServiceName} application"
-      SecretString: '{"PlexUsername": "", "PlexPassword": "", "PlexServerName": "", "PlexToken": ""}'
+      SecretString: '{"PlexUsername": "", "PlexPassword": "", "PlexServerName": ""}'
   
   SecretsManagerTraktSecret:
     Type: AWS::SecretsManager::Secret
@@ -141,21 +141,21 @@ Resources:
   #           Auth:
   #             ApiKeyRequired: true
 
-  PlexAuthenticateFunction:
+  PlexHealthCheckFunction:
     Type: AWS::Serverless::Function
     Properties:
-      FunctionName: !Sub "${ServiceName}-Plex-Authenticate"
+      FunctionName: !Sub "${ServiceName}-Plex-HealthCheck"
       Role: !GetAtt LambdaRole.Arn
       CodeUri: watch_wizard/
-      Handler: handlers/api/plex.authenticate
+      Handler: handlers/api/plex.health_check
       Events:
-        Post:
+        Get:
           Type: Api
           Properties:
             RestApiId:
               Ref: ApiGatewayApi
-            Path: "/plex/authenticate"
-            Method: post
+            Path: "/plex/health"
+            Method: get
             Auth:
               ApiKeyRequired: true
 
