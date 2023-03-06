@@ -1,4 +1,4 @@
-from utils.enhanced_json_encoder import EnhancedJSONEncoder
+from utils import EnhancedJSONEncoder
 from services.config import ConfigService
 from services.trakt import TraktService
 import json

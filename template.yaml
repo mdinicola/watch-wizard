@@ -105,41 +105,41 @@ Resources:
       KeyType: 'API_KEY'
       UsagePlanId: !Ref UsagePlan
 
-  # TraktGetAuthCodeFunction:
-  #   Type: AWS::Serverless::Function
-  #   Properties:
-  #     FunctionName: !Sub "${ServiceName}-Trakt-GetAuthCode"
-  #     Role: !GetAtt LambdaRole.Arn
-  #     CodeUri: watch_wizard/
-  #     Handler: handlers/api/trakt.get_auth_code
-  #     Events:
-  #       Get:
-  #         Type: Api
-  #         Properties:
-  #           RestApiId:
-  #             Ref: ApiGatewayApi
-  #           Path: "/trakt/auth-code"
-  #           Method: get
-  #           Auth:
-  #             ApiKeyRequired: true
+  TraktGetAuthCodeFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub "${ServiceName}-Trakt-GetAuthCode"
+      Role: !GetAtt LambdaRole.Arn
+      CodeUri: watch_wizard/
+      Handler: handlers/api/trakt.get_auth_code
+      Events:
+        Get:
+          Type: Api
+          Properties:
+            RestApiId:
+              Ref: ApiGatewayApi
+            Path: "/trakt/auth-code"
+            Method: get
+            Auth:
+              ApiKeyRequired: true
 
-  # TraktAuthenticateDeviceFunction:
-  #   Type: AWS::Serverless::Function
-  #   Properties:
-  #     FunctionName: !Sub "${ServiceName}-Trakt-AuthenticateDevice"
-  #     Role: !GetAtt LambdaRole.Arn
-  #     CodeUri: watch_wizard/
-  #     Handler: handlers/api/trakt.authenticate_device
-  #     Events:
-  #       Get:
-  #         Type: Api
-  #         Properties:
-  #           RestApiId:
-  #             Ref: ApiGatewayApi
-  #           Path: "/trakt/authenticate-device"
-  #           Method: post
-  #           Auth:
-  #             ApiKeyRequired: true
+  TraktAuthenticateDeviceFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub "${ServiceName}-Trakt-AuthenticateDevice"
+      Role: !GetAtt LambdaRole.Arn
+      CodeUri: watch_wizard/
+      Handler: handlers/api/trakt.authenticate_device
+      Events:
+        Get:
+          Type: Api
+          Properties:
+            RestApiId:
+              Ref: ApiGatewayApi
+            Path: "/trakt/authenticate-device"
+            Method: post
+            Auth:
+              ApiKeyRequired: true
 
   PlexHealthCheckFunction:
     Type: AWS::Serverless::Function
@@ -159,55 +159,73 @@ Resources:
             Auth:
               ApiKeyRequired: true
 
-  # RecommendMovieFunction:
-  #   Type: AWS::Serverless::Function
-  #   Properties:
-  #     FunctionName: !Sub "${ServiceName}-RecommendMovie"
-  #     Role: !GetAtt LambdaRole.Arn
-  #     CodeUri: watch_wizard/
-  #     Handler: handlers/api/media.recommend_movie
-  #     Events:
-  #       Get:
-  #         Type: Api
-  #         Properties:
-  #           RestApiId:
-  #             Ref: ApiGatewayApi
-  #           Path: "/media/recommend-movie"
-  #           Method: get
-  #           Auth:
-  #             ApiKeyRequired: true
+  MediaAvailabilityFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub "${ServiceName}-GetAvailability"
+      Role: !GetAtt LambdaRole.Arn
+      CodeUri: watch_wizard/
+      Handler: handlers/api/media.get_availability
+      Events:
+        Get:
+          Type: Api
+          Properties:
+            RestApiId:
+              Ref: ApiGatewayApi
+            Path: "/media/availability"
+            Method: get
+            Auth:
+              ApiKeyRequired: true
 
-  # AlexaSkillsApiFunction:
-  #   Type: AWS::Serverless::Function
-  #   Properties:
-  #     FunctionName: !Sub "${ServiceName}-AlexaSkillsApi"
-  #     Role: !GetAtt LambdaRole.Arn
-  #     CodeUri: watch_wizard/
-  #     Handler: handlers/api/alexa.handle_skill_request
-  #     Environment:
-  #       Variables:
-  #         AlexaSkillId: !Sub '{{resolve:secretsmanager:apps/${ServiceName}:SecretString:AlexaSkillId}}'
-  #     Events:
-  #       Post:
-  #         Type: Api
-  #         Properties:
-  #           RestApiId:
-  #             Ref: ApiGatewayApi
-  #           Path: "/alexa/skills"
-  #           Method: post
-  #           Auth:
-  #             ApiKeyRequired: false
+  RecommendMovieFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub "${ServiceName}-RecommendMovie"
+      Role: !GetAtt LambdaRole.Arn
+      CodeUri: watch_wizard/
+      Handler: handlers/api/media.recommend_movie
+      Events:
+        Get:
+          Type: Api
+          Properties:
+            RestApiId:
+              Ref: ApiGatewayApi
+            Path: "/media/recommend-movie"
+            Method: get
+            Auth:
+              ApiKeyRequired: true
 
-  # AlexaSkillsFunction:
-  #   Type: AWS::Serverless::Function
-  #   Properties:
-  #     FunctionName: !Sub "${ServiceName}-AlexaSkills"
-  #     Role: !GetAtt LambdaRole.Arn
-  #     CodeUri: watch_wizard/
-  #     Handler: handlers/alexa/lambda.handle_skill_request
-  #     Environment:
-  #       Variables:
-  #         AlexaSkillId: !Sub '{{resolve:secretsmanager:apps/${ServiceName}:SecretString:AlexaSkillId}}'
-  #     Events:
-  #       AlexaSkillEvent:
-  #         Type: AlexaSkill
+  AlexaSkillsApiFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub "${ServiceName}-AlexaSkillsApi"
+      Role: !GetAtt LambdaRole.Arn
+      CodeUri: watch_wizard/
+      Handler: handlers/api/alexa.handle_skill_request
+      Environment:
+        Variables:
+          AlexaSkillId: !Sub '{{resolve:secretsmanager:apps/${ServiceName}:SecretString:AlexaSkillId}}'
+      Events:
+        Post:
+          Type: Api
+          Properties:
+            RestApiId:
+              Ref: ApiGatewayApi
+            Path: "/alexa/skills"
+            Method: post
+            Auth:
+              ApiKeyRequired: false
+
+  AlexaSkillsFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub "${ServiceName}-AlexaSkills"
+      Role: !GetAtt LambdaRole.Arn
+      CodeUri: watch_wizard/
+      Handler: handlers/alexa/lambda.handle_skill_request
+      Environment:
+        Variables:
+          AlexaSkillId: !Sub '{{resolve:secretsmanager:apps/${ServiceName}:SecretString:AlexaSkillId}}'
+      Events:
+        AlexaSkillEvent:
+          Type: AlexaSkill

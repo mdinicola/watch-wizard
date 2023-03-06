@@ -1,5 +1,7 @@
 from plexapi.myplex import MyPlexAccount
 from plexapi.server import PlexServer
+from plexapi.video import Video, Movie, Show
+from utils import distinct
 import logging
 
 _logger = logging.getLogger(__name__)
@@ -26,3 +28,19 @@ class PlexService:
         except Exception as e:
             _logger.error(e)
         return False
+    
+    def search_media(self, query: str, media_type: str = "movie"):
+        self.connect()
+        results = self.account.searchDiscover(query, 1, 'media_type')
+        if (len(results) == 0):
+            return None
+        return results[0]
+
+    def get_availability(self, media: Video):
+        self.connect()
+        streaming_services = media.streamingServices()
+        if (len(streaming_services) == 0):
+            return []
+        subscription_streaming_services = list(filter(lambda x: x.offerType == "subscription", streaming_services))
+        return distinct(subscription_streaming_services, 'platform')
+        

@@ -1,6 +1,15 @@
 from dataclasses import is_dataclass, asdict
 import json
 
+def distinct(sequence: list, key: str):
+    seen = set()
+    for s in sequence:
+        value = getattr(s, key)
+        if not value in seen:
+            seen.add(value)
+            yield s
+    return seen
+
 class EnhancedJSONEncoder(json.JSONEncoder):
     def default(self, o):
         try:

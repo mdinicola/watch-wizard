@@ -89,7 +89,7 @@ paths:
           Fn::Sub: "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${PlexHealthCheckFunction.Arn}/invocations"
       security:
         - api_key: []
-  "/movies/recommend-movie":
+  "/media/recommend-movie":
     get:
       summary: RecommendMovie Function
       description: Recommends a movie
@@ -110,6 +110,29 @@ paths:
         httpMethod: POST
         uri: 
           Fn::Sub: "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${RecommendMovieFunction.Arn}/invocations"
+      security:
+        - api_key: []
+  "/media/availability":
+    get:
+      summary: Media Availability
+      description: Gets the availability of media on streaming services
+      operationId: MediaAvailabilityFunction
+      produces:
+        - application/json
+      responses:
+        200:
+          description: Success
+        404:
+          description: Not found
+        500:
+          description: 500 Internal Server Error
+        503:
+          description: SERVICE UNAVAILABLE
+      x-amazon-apigateway-integration:
+        type: aws_proxy
+        httpMethod: POST
+        uri: 
+          Fn::Sub: "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MediaAvailabilityFunction.Arn}/invocations"
       security:
         - api_key: []
   "/alexa/skills":

@@ -1,6 +1,5 @@
 from trakt import core
 from trakt import movies as trakt_movies
-from services.movies import Movie
 from dataclasses import dataclass
 import logging
 import time
@@ -79,5 +78,4 @@ class TraktService:
         return response
 
     def get_recommended_movie(self):
-        trakt_movie = random.choice(trakt_movies.get_recommended_movies())
-        return Movie.from_trakt(trakt_movie)
+        return random.choice(trakt_movies.get_recommended_movies())
