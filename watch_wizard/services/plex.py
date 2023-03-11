@@ -29,12 +29,10 @@ class PlexService:
             _logger.error(e)
         return False
     
-    def search_media(self, query: str, media_type: str = "movie"):
+    def search_media(self, query: str, media_type: str, limit: int = 1):
         self.connect()
-        results = self.account.searchDiscover(query, 1, 'media_type')
-        if (len(results) == 0):
-            return None
-        return results[0]
+        results = self.account.searchDiscover(query, limit, media_type)
+        return results
 
     def get_availability(self, media: Video):
         self.connect()

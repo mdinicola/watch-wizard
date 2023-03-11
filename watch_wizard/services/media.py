@@ -61,14 +61,18 @@ class MediaService:
     def recommend_movie(self):
         trakt_movie = self.trakt_service.get_recommended_movie()
         return Movie.from_trakt(trakt_movie)
-        
-    def get_availability(self, query: str, media_type: str = 'movie'):
+    
+    def search(self, query: str, media_type: str, limit: int):
+        results = self.plex_service.search_media(query, media_type, limit)
+        media_list = []
+        if (len(results) == 0):
+            return media_list
+
         platform_exclusions = ['netflix-basic-with-ads']
-        media = self.plex_service.search_media(query, media_type)
-        if not media:
-            return None
-        availability = list(map(Availability.from_plex, self.plex_service.get_availability(media)))
-        availability = list(filter(lambda x: x.platform not in platform_exclusions, availability))
-        movie = Movie.from_plex(media)
-        movie.availability = availability
-        return movie
+        for media in results:
+            availability = list(map(Availability.from_plex, self.plex_service.get_availability(media)))
+            availability = list(filter(lambda x: x.platform not in platform_exclusions, availability))
+            movie = Movie.from_plex(media)
+            movie.availability = availability
+            media_list.append(movie)
+        return media_list

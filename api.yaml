@@ -112,11 +112,11 @@ paths:
           Fn::Sub: "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${RecommendMovieFunction.Arn}/invocations"
       security:
         - api_key: []
-  "/media/availability":
+  "/media/search":
     get:
-      summary: Media Availability
-      description: Gets the availability of media on streaming services
-      operationId: MediaAvailabilityFunction
+      summary: Search Media
+      description: Searches for movies and tv shows
+      operationId: SearchMedia
       produces:
         - application/json
       responses:
@@ -132,7 +132,7 @@ paths:
         type: aws_proxy
         httpMethod: POST
         uri: 
-          Fn::Sub: "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MediaAvailabilityFunction.Arn}/invocations"
+          Fn::Sub: "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${SearchMediaFunction.Arn}/invocations"
       security:
         - api_key: []
   "/alexa/skills":

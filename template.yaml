@@ -159,20 +159,20 @@ Resources:
             Auth:
               ApiKeyRequired: true
 
-  MediaAvailabilityFunction:
+  SearchMediaFunction:
     Type: AWS::Serverless::Function
     Properties:
-      FunctionName: !Sub "${ServiceName}-GetAvailability"
+      FunctionName: !Sub "${ServiceName}-SearchMedia"
       Role: !GetAtt LambdaRole.Arn
       CodeUri: watch_wizard/
-      Handler: handlers/api/media.get_availability
+      Handler: handlers/api/media.search
       Events:
         Get:
           Type: Api
           Properties:
             RestApiId:
               Ref: ApiGatewayApi
-            Path: "/media/availability"
+            Path: "/media/search"
             Method: get
             Auth:
               ApiKeyRequired: true
