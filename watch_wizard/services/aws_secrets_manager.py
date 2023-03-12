@@ -12,7 +12,7 @@ class SecretsManagerService:
         secretsManagerEndpoint = os.environ.get('SecretsManagerEndpoint')
         if secretsManagerEndpoint != '':
             return boto3.client('secretsmanager', endpoint_url = secretsManagerEndpoint)
-        return boto3.client('secretsmanager'), secretsManagerEndpoint
+        return boto3.client('secretsmanager')
 
     def __init__(self, client = None):
         self.client = client
