@@ -1,12 +1,13 @@
 from ask_sdk_core.dispatch_components import AbstractRequestHandler, AbstractExceptionHandler
 from services.config import ConfigService
-from services.trakt import TraktService
-from services.movies import MovieService
+from services.media import MediaService
 import ask_sdk_core.utils as ask_utils
 import logging
 
 _logger = logging.getLogger(__name__)
 _config_service = ConfigService.load_config()
+_media_service = MediaService(_config_service.trakt_config, _config_service.plex_config, 
+                                _config_service.config.get('secrets_manager_endpoint'))
 
 ### Define Alexa request handler classes
 
@@ -31,8 +32,7 @@ class RecommendMovieIntentHandler(AbstractRequestHandler):
         return ask_utils.is_intent_name("RecommendMovieIntent")(handler_input)
 
     def handle(self, handler_input):
-        trakt_client = TraktService(_config_service.trakt_config.get('secret_name'), _config_service.config.get('secrets_manager_endpoint'))
-        movie = MovieService(trakt_client).recommend_movie()
+        movie = _media_service.recommend_movie()
         message = movie.recommendation_message()
         speak_output = message
 

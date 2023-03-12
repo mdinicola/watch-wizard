@@ -222,7 +222,7 @@ Resources:
       FunctionName: !Sub "${ServiceName}-AlexaSkills"
       Role: !GetAtt LambdaRole.Arn
       CodeUri: watch_wizard/
-      Handler: handlers/alexa/lambda.handle_skill_request
+      Handler: handlers/alexa/lambdas.handle_skill_request
       Environment:
         Variables:
           AlexaSkillId: !Sub '{{resolve:secretsmanager:apps/${ServiceName}:SecretString:AlexaSkillId}}'
