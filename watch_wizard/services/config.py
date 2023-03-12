@@ -5,7 +5,6 @@ import logging
 _logger = logging.getLogger(__name__)
 _TRAKT_SECRET_NAME_KEY = 'TraktSecretName'
 _APP_SECRET_NAME_KEY = 'ServiceSecretName'
-_ALEXA_SKILL_ID_KEY = 'AlexaSkillId'
 
 class ConfigService:
     _secrets_manager_service = SecretsManagerService()
@@ -43,6 +42,6 @@ class ConfigService:
         }
         
         alexa_config = {
-             'skill_id': os.environ[_ALEXA_SKILL_ID_KEY]
+             'skill_id': app_secret.get_value('AlexaSkillId')
         }
         return cls(config, trakt_config, plex_config, alexa_config)

@@ -11,7 +11,6 @@ Globals:
         ServiceSecretName: !Sub "apps/${ServiceName}"
         TraktSecretName: !Sub "apps/${ServiceName}-Trakt"
         SecretsManagerEndpoint: ""
-        AlexaSkillId: ""
 Parameters:
   ServiceName:
     Type: String
@@ -49,14 +48,12 @@ Resources:
     Properties:
       Name: !Sub "apps/${ServiceName}"
       Description: !Sub "Secret values for the ${ServiceName} application"
-      SecretString: '{"PlexUsername": "", "PlexPassword": "", "PlexServerName": ""}'
   
   SecretsManagerTraktSecret:
     Type: AWS::SecretsManager::Secret
     Properties:
       Name: !Sub "apps/${ServiceName}-Trakt"
       Description: !Sub "Trakt-specific secret values for the ${ServiceName} application"
-      SecretString: '{"CLIENT_ID": "", "CLIENT_SECRET": ""}'
 
   ApiGatewayApi:
     Type: AWS::Serverless::Api
@@ -202,9 +199,6 @@ Resources:
       Role: !GetAtt LambdaRole.Arn
       CodeUri: watch_wizard/
       Handler: handlers/api/alexa.handle_skill_request
-      Environment:
-        Variables:
-          AlexaSkillId: !Sub '{{resolve:secretsmanager:apps/${ServiceName}:SecretString:AlexaSkillId}}'
       Events:
         Post:
           Type: Api
@@ -223,9 +217,6 @@ Resources:
       Role: !GetAtt LambdaRole.Arn
       CodeUri: watch_wizard/
       Handler: handlers/alexa/lambdas.handle_skill_request
-      Environment:
-        Variables:
-          AlexaSkillId: !Sub '{{resolve:secretsmanager:apps/${ServiceName}:SecretString:AlexaSkillId}}'
       Events:
         AlexaSkillEvent:
           Type: AlexaSkill
