@@ -62,7 +62,7 @@ class MovieAvailabilityIntentHandler(AbstractRequestHandler):
         movie_list = _media_service.search(movie_title, 'movie', 1)
         if movie_list:
             movie: Movie = movie_list[0]
-            message = f'Found movie: {movie_title}.  {movie.availability_message()}'
+            message = f'Found movie: {movie.title} ({movie.year}).  {movie.availability_message()}'
         else:
             message = f'I was unable to find movie: {movie_title}'
         
