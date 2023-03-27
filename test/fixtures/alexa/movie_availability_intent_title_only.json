@@ -1,0 +1,149 @@
+{
+	"version": "1.0",
+	"session": {
+		"new": true,
+		"sessionId": "amzn1.echo-api.session.034391eb-6cab-4a6c-bd0e-50a5358fa7c0",
+		"application": {
+			"applicationId": "a1234"
+		},
+		"attributes": {},
+		"user": {
+			"userId": "amzn1.ask.account.AFJ6F4ONYJMMR7T5ISHYQREUVFWLRYSJLPZLC7OQCCUHNSQONGPLIANZPTXUH4KJTOVCBL6D7472MAL7CA3TXLPG43WHHONAAC4LYFYJLVA4RE3SXEPBR2RATTZ3O3EDRDL7N3CTC5ZVYZG6MGUPQTMSHMLC5ECSTIFJNG7RASUBANK26YO6WPHAVQ4A7NOUANRNNIIBBKRJ6EI"
+		}
+	},
+	"context": {
+		"Viewports": [
+			{
+				"type": "APL",
+				"id": "main",
+				"shape": "RECTANGLE",
+				"dpi": 213,
+				"presentationType": "STANDARD",
+				"canRotate": false,
+				"configuration": {
+					"current": {
+						"mode": "HUB",
+						"video": {
+							"codecs": [
+								"H_264_42",
+								"H_264_41"
+							]
+						},
+						"size": {
+							"type": "DISCRETE",
+							"pixelWidth": 1280,
+							"pixelHeight": 800
+						}
+					}
+				}
+			}
+		],
+		"Viewport": {
+			"experiences": [
+				{
+					"arcMinuteWidth": 346,
+					"arcMinuteHeight": 216,
+					"canRotate": false,
+					"canResize": false
+				}
+			],
+			"mode": "HUB",
+			"shape": "RECTANGLE",
+			"pixelWidth": 1280,
+			"pixelHeight": 800,
+			"dpi": 213,
+			"currentPixelWidth": 1280,
+			"currentPixelHeight": 800,
+			"touch": [
+				"SINGLE"
+			],
+			"video": {
+				"codecs": [
+					"H_264_42",
+					"H_264_41"
+				]
+			}
+		},
+		"Extensions": {
+			"available": {
+				"aplext:backstack:10": {}
+			}
+		},
+		"System": {
+			"application": {
+				"applicationId": "a1234"
+			},
+			"user": {
+				"userId": "amzn1.ask.account.AFJ6F4ONYJMMR7T5ISHYQREUVFWLRYSJLPZLC7OQCCUHNSQONGPLIANZPTXUH4KJTOVCBL6D7472MAL7CA3TXLPG43WHHONAAC4LYFYJLVA4RE3SXEPBR2RATTZ3O3EDRDL7N3CTC5ZVYZG6MGUPQTMSHMLC5ECSTIFJNG7RASUBANK26YO6WPHAVQ4A7NOUANRNNIIBBKRJ6EI"
+			},
+			"device": {
+				"deviceId": "amzn1.ask.device.AFZLYVXI2IMCOCMDWKGIY6ATFTMVBOPK36IGQ4JTK3MTKXC7XJXDALEFJOKYPQ66MO2PYXFKRZWRPA4EDOHGMY2VFJQJ4IVUS5PMJKOLBXHKL64JWXZGFQ3VLFETOPG2XQ7ZZ6VKS6YZVBI3VAJ3WZRGMC5TR6P3FU6BSXUE5VGIDKNXDFMTU",
+				"supportedInterfaces": {}
+			},
+			"apiEndpoint": "https://api.amazonalexa.com",
+			"apiAccessToken": "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImtpZCI6IjEifQ.eyJhdWQiOiJodHRwczovL2FwaS5hbWF6b25hbGV4YS5jb20iLCJpc3MiOiJBbGV4YVNraWxsS2l0Iiwic3ViIjoiYW16bjEuYXNrLnNraWxsLmVlZDdhNTNiLWFlMzAtNDk4YS1hYmFhLWMyMWEzMjkxMTQ2OSIsImV4cCI6MTY3ODY2OTA0OCwiaWF0IjoxNjc4NjY4NzQ4LCJuYmYiOjE2Nzg2Njg3NDgsInByaXZhdGVDbGFpbXMiOnsiY29udGV4dCI6IkFBQUFBQUFBQUFEdG5XSFBEak0vZFBJeVluVEs3eXNIS3dFQUFBQUFBQUNUMm5DVXFwM1B3VTc2cmQrV01sQi9TaFZVVUhIbDFDZitrNnI4RWl5Q04xVSt4Qmh3Q2RIWm1hRHpaOERXcFZlRjFKUnRhNGx4eEpPN21XVVJoQ3lWMVQ0TGJPemFpc1p4TkdIaEJTbnN5bCtOOVVJdU1GZk5SOXNKL3hxSUdYOEdVS1BaVWRrYXkvVmhPanl4czFMdlM5bVZaQytJY3Y0NFV2ZmtUVDVLRUxOSkRTMGU2VGN4ME5xd29qVitSWVB6Ty90ck04N29XdDdOVWw2SC9uSmtIZVZPbE0xWnRuUndYRHQ3dUxBS2lqWW92LzdUSnpwL3ZGMWFERU1YaUFqMFAyYkgyTDQ1WEl0bU5oQ3BPMitWVlJNQkhOZnlJdUJGdnFaMnBHQk1OUXZqWjlQbDZPdmQxeFpJcDZRbGJzanJMeUpvUnFsbTBuSEFraGxpTHdkM2tIOHRQbHF4TTBnL3BDSkNUWnJXOE5XMklwbjdkVEhhRzF4OTVrL3ZxYmJkQlRPdHI2c3k5aEQxUlE9PSIsImRldmljZUlkIjoiYW16bjEuYXNrLmRldmljZS5BRlpMWVZYSTJJTUNPQ01EV0tHSVk2QVRGVE1WQk9QSzM2SUdRNEpUSzNNVEtYQzdYSlhEQUxFRkpPS1lQUTY2TU8yUFlYRktSWldSUEE0RURPSEdNWTJWRkpRSjRJVlVTNVBNSktPTEJYSEtMNjRKV1haR0ZRM1ZMRkVUT1BHMlhRN1paNlZLUzZZWlZCSTNWQUozV1pSR01DNVRSNlAzRlU2QlNYVUU1VkdJREtOWERGTVRVIiwidXNlcklkIjoiYW16bjEuYXNrLmFjY291bnQuQUZKNkY0T05ZSk1NUjdUNUlTSFlRUkVVVkZXTFJZU0pMUFpMQzdPUUNDVUhOU1FPTkdQTElBTlpQVFhVSDRLSlRPVkNCTDZENzQ3Mk1BTDdDQTNUWExQRzQzV0hIT05BQUM0TFlGWUpMVkE0UkUzU1hFUEJSMlJBVFRaM08zRURSREw3TjNDVEM1WlZZWkc2TUdVUFFUTVNITUxDNUVDU1RJRkpORzdSQVNVQkFOSzI2WU82V1BIQVZRNEE3Tk9VQU5STk5JSUJCS1JKNkVJIn19.WvYpJcMPqS0kOQHMi6KIj80VlEiQeUis-BPhtO2nPGysFCY7QFhBEF30nRAX1khCBV0ZWwKSDjFAIwkuNB3N5VpLjNopFJWwWy1cNQAT0ErvNDCSDaKpyR4qlyE6gLs-sOFcjCNvgVp0nH3Vo06K4Btf17ucgo8KqG0hFQy8eDCm8NCrYWlBTPA4OE5VBJq9fazuO4SG-cvZFoYnXY9mHBU7_BlLS0KQTfa1eHXTWMDr10VFSdLgeNIQbcRhQm_iZK6iWn__6meiHlZ1gkyvtvRBaw4hMP6eVuJddo-sa09jeUEc2V9c_KWCVXGajyjYPk3owLOqH4xQjyOOxK3ROw"
+		}
+	},
+	"request": {
+		"type": "IntentRequest",
+		"requestId": "amzn1.echo-api.request.6b2dd225-e087-4c22-8e97-d6303588e047",
+		"locale": "en-CA",
+		"timestamp": "2023-03-13T00:52:28Z",
+		"intent": {
+			"name": "MovieAvailabilityIntent",
+			"confirmationStatus": "NONE",
+			"slots": {
+				"movieTitle": {
+					"name": "movieTitle",
+					"value": "murder mystery",
+					"resolutions": {
+						"resolutionsPerAuthority": [
+							{
+								"authority": "AlexaEntities",
+								"status": {
+									"code": "ER_SUCCESS_MATCH"
+								},
+								"values": [
+									{
+										"value": {
+											"name": "The Fabelmans",
+											"id": "https://ld.amazonalexa.com/entities/v1/6GZ1E72N472GDZ1ElbOSu7"
+										}
+									}
+								]
+							}
+						]
+					},
+					"confirmationStatus": "NONE",
+					"source": "USER",
+					"slotValue": {
+						"type": "Simple",
+						"value": "murder mystery",
+						"resolutions": {
+							"resolutionsPerAuthority": [
+								{
+									"authority": "AlexaEntities",
+									"status": {
+										"code": "ER_SUCCESS_MATCH"
+									},
+									"values": [
+										{
+											"value": {
+												"name": "The Fabelmans",
+												"id": "https://ld.amazonalexa.com/entities/v1/6GZ1E72N472GDZ1ElbOSu7"
+											}
+										}
+									]
+								}
+							]
+						}
+					}
+				},
+				"year": {
+					"name": "year",
+					"confirmationStatus": "NONE"
+				}
+			}
+		}
+	}
+}
