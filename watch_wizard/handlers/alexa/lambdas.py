@@ -1,7 +1,7 @@
 from services.config import ConfigService
 from handlers.alexa.requests import LaunchRequestHandler, HelpIntentHandler, SessionEndedRequestHandler
 from handlers.alexa.requests import IntentReflectorHandler, CancelOrStopIntentHandler, CatchAllExceptionHandler
-from handlers.alexa.requests import RecommendMovieIntentHandler
+from handlers.alexa.requests import MovieRecommendationIntentHandler, MovieAvailabilityIntentHandler
 from services.alexa import AlexaService
 import logging
 
@@ -14,8 +14,8 @@ def alexa_service():
     alexa_service = AlexaService(_config_service.alexa_config.get('skill_id'))
 
     # make sure IntentReflectorHandler is last so it doesn't override your custom intent handlers
-    alexa_service.add_request_handlers([ LaunchRequestHandler(), RecommendMovieIntentHandler(), HelpIntentHandler(),
-                                        CancelOrStopIntentHandler(), SessionEndedRequestHandler(), IntentReflectorHandler() ])
+    alexa_service.add_request_handlers([ LaunchRequestHandler(), MovieRecommendationIntentHandler(), MovieAvailabilityIntentHandler(),
+                                        HelpIntentHandler(), CancelOrStopIntentHandler(), SessionEndedRequestHandler(), IntentReflectorHandler() ])
 
     alexa_service.add_exception_handler(CatchAllExceptionHandler())
     return alexa_service

@@ -1,6 +1,6 @@
 from ask_sdk_core.dispatch_components import AbstractRequestHandler, AbstractExceptionHandler
 from services.config import ConfigService
-from services.media import MediaService
+from services.media import MediaService, Movie
 import ask_sdk_core.utils as ask_utils
 import logging
 
@@ -26,14 +26,46 @@ class LaunchRequestHandler(AbstractRequestHandler):
                 .response
         )
 
-class RecommendMovieIntentHandler(AbstractRequestHandler):
-    """Handler for Recommend Movie Intent."""
+class MovieRecommendationIntentHandler(AbstractRequestHandler):
+    """Handler for Movie Recommendation Intent."""
     def can_handle(self, handler_input):
-        return ask_utils.is_intent_name("RecommendMovieIntent")(handler_input)
+        return ask_utils.is_intent_name("MovieRecommendationIntent")(handler_input)
 
     def handle(self, handler_input):
-        movie = _media_service.recommend_movie()
+        movie: Movie = _media_service.recommend_movie()
         message = movie.recommendation_message()
+        speak_output = message
+
+        return (
+            handler_input.response_builder
+                .speak(speak_output)
+                # .ask("add a reprompt if you want to keep the session open for the user to respond")
+                .response
+        )
+    
+class MovieAvailabilityIntentHandler(AbstractRequestHandler):
+    """Handler for Movie Availability Intent."""
+    def can_handle(self, handler_input):
+        return ask_utils.is_intent_name("MovieAvailabilityIntent")(handler_input)
+
+    def handle(self, handler_input):
+        movie_title_slot_value = ask_utils.get_slot_value_v2(handler_input,'movieTitle')
+        movie_title_slot_values = list(map(lambda x: x.value, ask_utils.get_simple_slot_values(movie_title_slot_value)))
+        movie_title = movie_title_slot_values[0]
+
+        year_slot_value = ask_utils.get_slot_value_v2(handler_input,'year')
+        if year_slot_value is not None:
+            year_slot_values = list(map(lambda x: x.value, ask_utils.get_simple_slot_values(year_slot_value)))
+            year = year_slot_values[0]
+            movie_title += f' ({year})'
+
+        movie_list = _media_service.search(movie_title, 'movie', 1)
+        if movie_list:
+            movie: Movie = movie_list[0]
+            message = f'Found movie: {movie_title}.  {movie.availability_message()}'
+        else:
+            message = f'I was unable to find movie: {movie_title}'
+        
         speak_output = message
 
         return (

@@ -73,7 +73,11 @@ class Movie:
             self.availability = results[0].availability
 
     def recommendation_message(self):
-        message = f'You should watch: {self.title} ({self.year}).  '
+        message = f'You should watch: {self.title} ({self.year}).  {self.availability_message()}'
+        return message
+    
+    def availability_message(self):
+        message = ''
         if self.availability:
             message += f'It is available on: {", ".join(x.title for x in self.availability)}'
         else:
