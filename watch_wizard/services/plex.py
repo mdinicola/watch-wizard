@@ -1,6 +1,6 @@
 from plexapi.myplex import MyPlexAccount
 from plexapi.server import PlexServer
-from plexapi.video import Video, Movie, Show
+from plexapi.video import Video as PlexVideo
 from utils import distinct
 import logging
 
@@ -34,7 +34,7 @@ class PlexService:
         results = self.account.searchDiscover(query, limit, media_type)
         return results
 
-    def get_availability(self, media: Video):
+    def get_availability(self, media: PlexVideo):
         self.connect()
         streaming_services = media.streamingServices()
         if (len(streaming_services) == 0):
