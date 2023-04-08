@@ -29,18 +29,17 @@ def recommend_movie(event, context):
 def search(event, context):
     try:
         query_parameters = event.get('queryStringParameters', {})
-        query = query_parameters.get('query', '')
+        query_title = query_parameters.get('title', '')
         query_year = query_parameters.get('year', '')
         query_type = query_parameters.get('type', 'movie')
         query_limit = query_parameters.get('limit', 1)
         
-        if query == '':
-            raise Exception('Invalid query parameter')
-
+        if query_title == '':
+            raise Exception('Invalid query parameters')
+        
+        query = f'{query_title}'
         if query_year != '':
-            query = f'{query} ({query_year})'
-        else:
-            query = f'{query}'
+            query = f'{query_title} ({query_year})'
 
         media_list = _media_service.search(query, query_type, query_limit)
             
