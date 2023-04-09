@@ -5,6 +5,8 @@ import json
 import logging
 
 _logger = logging.getLogger(__name__)
+_logger.setLevel(logging.INFO)
+
 _config_service = ConfigService.load_config()
 
 def get_auth_code(event, context) -> dict:

@@ -4,6 +4,8 @@ import json
 import logging
 
 _logger = logging.getLogger(__name__)
+_logger.setLevel(logging.INFO)
+
 _config_service = ConfigService.load_config()
 _plex_service = PlexService(_config_service.plex_config)
 

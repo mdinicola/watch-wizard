@@ -1,7 +1,6 @@
 from dataclasses import dataclass
 from trakt.utils import slugify
 
-
 class Movie:
     def __init__(self, data: dict) -> None:
         self.title = data.get('title')

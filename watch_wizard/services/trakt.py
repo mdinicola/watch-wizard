@@ -6,6 +6,7 @@ import time
 import random
 
 _logger = logging.getLogger(__name__)
+_logger.setLevel(logging.INFO)
 
 class TraktService:
     def __init__(self, aws_secret_name, aws_secrets_manager_endpoint = '') -> None:

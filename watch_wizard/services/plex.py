@@ -8,6 +8,7 @@ from typing import List
 import logging
 
 _logger = logging.getLogger(__name__)
+_logger.setLevel(logging.INFO)
 
 class PlexService:
     def __init__(self, config: dict) -> None:

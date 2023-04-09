@@ -3,6 +3,10 @@ from services.plex import PlexService
 from plexapi.video import Video as PlexVideo
 from models import Movie, Availability
 from typing import List
+import logging
+
+_logger = logging.getLogger(__name__)
+_logger.setLevel(logging.INFO)
 
 class MediaService:
     def __init__(self, trakt_config: dict, plex_config: dict, secrets_manager_endpoint: str) -> None:

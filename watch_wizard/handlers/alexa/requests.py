@@ -5,6 +5,8 @@ import ask_sdk_core.utils as ask_utils
 import logging
 
 _logger = logging.getLogger(__name__)
+_logger.setLevel(logging.INFO)
+
 _config_service = ConfigService.load_config()
 _media_service = MediaService(_config_service.trakt_config, _config_service.plex_config, 
                                 _config_service.config.get('secrets_manager_endpoint'))

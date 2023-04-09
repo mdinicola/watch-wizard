@@ -3,6 +3,7 @@ import json
 import logging
 
 _logger = logging.getLogger(__name__)
+_logger.setLevel(logging.INFO)
 
 def handle_skill_request(event, context) -> dict:
     handler = alexa_service().get_webservice_handler()

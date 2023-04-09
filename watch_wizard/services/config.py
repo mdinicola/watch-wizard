@@ -3,6 +3,8 @@ import os
 import logging
 
 _logger = logging.getLogger(__name__)
+_logger.setLevel(logging.INFO)
+
 _TRAKT_SECRET_NAME_KEY = 'TraktSecretName'
 _APP_SECRET_NAME_KEY = 'ServiceSecretName'
 

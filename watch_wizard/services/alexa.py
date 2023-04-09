@@ -4,6 +4,7 @@ import os
 import logging
 
 _logger = logging.getLogger(__name__)
+_logger.setLevel(logging.INFO)
 
 class AlexaService:
     def __init__(self, skill_id) -> None:
