@@ -23,14 +23,14 @@ class MediaService:
 
         platform_exclusions = ['netflix-basic-with-ads']
         for media in results:
-            availability_list: List[Availability] = self.plex_service.get_availability(media)
+            availability_list: List[Availability] = self.plex_service.get_media_availability(media)
             availability: List[Availability] = list(filter(lambda x: x.platform not in platform_exclusions, availability_list))
             movie: Movie = Movie.from_plex(media)
             movie.availability = availability
             media_list.append(movie)
         return media_list
     
-    def get_availability(self, media: Movie) -> None:
+    def get_media_availability(self, media: Movie) -> None:
         results: List[Movie] = self.search(f'{media.title} + ({media.year})', 1)
         if results:
             media.availability = results[0].availability

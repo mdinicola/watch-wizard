@@ -37,14 +37,31 @@ class PlexService:
         results: List[PlexVideo] = self.account.searchDiscover(query, limit, media_type)
         return results
 
-    def get_availability(self, media: PlexVideo) -> List[Availability]:
+    def get_plex_availability(self, media: PlexVideo) -> Availability:
+        plex_results = self.server.search(f'{media.title}')
+        if plex_results:
+            return Availability({
+                'platform': 'plex',
+                'title': 'Plex'
+            })
+        return None
+    
+    def get_media_availability(self, media: PlexVideo) -> List[Availability]:
         self.connect()
         availability: List[Availability] = []
+
+        # Check if media is available in Plex library
+        plex_availability = self.get_plex_availability((media))
+        if plex_availability:
+            availability.append(plex_availability)
+
+        # Check if media is available on any streaming services
         streaming_services: List[PlexAvailability] = media.streamingServices()
         if (len(streaming_services) > 0):
-            subscription_streaming_services = list(filter(lambda x: x.offerType == "subscription", streaming_services))
+            subscription_streaming_services: List[PlexAvailability] = list(filter(lambda x: x.offerType == "subscription", streaming_services))
             distinct_streaming_services = distinct(subscription_streaming_services, 'platform')
-            subscription_availability = list(map(Availability.from_plex, distinct_streaming_services))
+            subscription_availability: List[Availability] = list(map(Availability.from_plex, distinct_streaming_services))
             availability.extend(subscription_availability)
+
         return availability
         
