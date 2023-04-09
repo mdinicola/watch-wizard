@@ -1,6 +1,8 @@
 from utils import EnhancedJSONEncoder
 from services.config import ConfigService
 from services.media import MediaService
+from models import Movie
+from typing import List
 import json
 import logging
 
@@ -9,9 +11,9 @@ _config_service = ConfigService.load_config()
 _media_service = MediaService(_config_service.trakt_config, _config_service.plex_config, 
                                 _config_service.config.get('secrets_manager_endpoint'))
 
-def recommend_movie(event, context):
+def recommend_movie(event, context) -> dict:
     try:
-        movie = _media_service.recommend_movie()
+        movie: Movie = _media_service.recommend_movie()
    
         return {
             'statusCode': 200,
@@ -26,7 +28,7 @@ def recommend_movie(event, context):
             'body': json.dumps({'message': message})
         }
     
-def search(event, context):
+def search(event, context) -> dict:
     try:
         query_parameters = event.get('queryStringParameters', {})
         query_title = query_parameters.get('title', '')
@@ -41,7 +43,7 @@ def search(event, context):
         if query_year != '':
             query = f'{query_title} ({query_year})'
 
-        media_list = _media_service.search(query, query_type, query_limit)
+        media_list: List[Movie] = _media_service.search(query, query_type, query_limit)
             
         return {
             'statusCode': 200,

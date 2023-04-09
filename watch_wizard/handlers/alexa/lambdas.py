@@ -9,7 +9,7 @@ _logger = logging.getLogger(__name__)
 _config_service = ConfigService.load_config()
 
 # Configures and returns an AlexaService
-def alexa_service():
+def alexa_service() -> AlexaService:
     # Creates AlexaClient and verifies configured skill_id matches incoming Alexa requests
     alexa_service = AlexaService(_config_service.alexa_config.get('skill_id'))
 

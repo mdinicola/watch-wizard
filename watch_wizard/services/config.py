@@ -1,4 +1,4 @@
-from services.aws_secrets_manager import SecretsManagerService
+from services.aws_secrets_manager import SecretsManagerService, SecretsManagerSecret
 import os
 import logging
 
@@ -9,7 +9,7 @@ _APP_SECRET_NAME_KEY = 'ServiceSecretName'
 class ConfigService:
     _secrets_manager_service = SecretsManagerService()
 
-    def __init__(self, config: dict, trakt_config: dict, plex_config: dict, alexa_config: dict):
+    def __init__(self, config: dict, trakt_config: dict, plex_config: dict, alexa_config: dict) -> None:
             self.config = config
             self.trakt_config = trakt_config
             self.plex_config = plex_config
@@ -22,10 +22,10 @@ class ConfigService:
         }
 
         app_secret_name = os.environ[_APP_SECRET_NAME_KEY]
-        app_secret = ConfigService._secrets_manager_service.get_secret(app_secret_name)
+        app_secret: SecretsManagerSecret = ConfigService._secrets_manager_service.get_secret(app_secret_name)
 
         trakt_secret_name = os.environ[_TRAKT_SECRET_NAME_KEY]
-        trakt_secret = ConfigService._secrets_manager_service.get_secret(trakt_secret_name)
+        trakt_secret: SecretsManagerSecret = ConfigService._secrets_manager_service.get_secret(trakt_secret_name)
         trakt_config = {
             'secret_name': trakt_secret_name,
             'client_id': trakt_secret.get_value('CLIENT_ID'),

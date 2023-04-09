@@ -4,7 +4,7 @@ import logging
 
 _logger = logging.getLogger(__name__)
 
-def handle_skill_request(event, context):
+def handle_skill_request(event, context) -> dict:
     handler = alexa_service().get_webservice_handler()
     response = handler.verify_request_and_dispatch(event['headers'], event['body'])
    

@@ -1,5 +1,5 @@
 from trakt import core
-from trakt import movies as trakt_movies
+from trakt import movies as TraktMovies
 from models import DeviceAuthData
 import logging
 import time
@@ -8,7 +8,7 @@ import random
 _logger = logging.getLogger(__name__)
 
 class TraktService:
-    def __init__(self, aws_secret_name, aws_secrets_manager_endpoint = ''):
+    def __init__(self, aws_secret_name, aws_secrets_manager_endpoint = '') -> None:
         core.CONFIG_TYPE = 'AWS_SECRETS_MANAGER'
         core.CONFIG_SECRET_NAME = aws_secret_name
         if aws_secrets_manager_endpoint != '':
@@ -16,7 +16,7 @@ class TraktService:
         core.load_config()
 
     @staticmethod
-    def get_auth_code(client_id: str, client_secret: str):
+    def get_auth_code(client_id: str, client_secret: str) -> dict:
         response = core.get_device_code(client_id = client_id, client_secret = client_secret)
         device_auth_data = DeviceAuthData(user_code = response['user_code'], device_code = response['device_code'], 
             verification_url = response['verification_url'], poll_interval = response['interval'])
@@ -26,7 +26,7 @@ class TraktService:
         }
 
     @staticmethod
-    def authenticate_device(device_code: str, poll_interval: int, aws_secret_name: str, aws_secrets_manager_endpoint = ''):
+    def authenticate_device(device_code: str, poll_interval: int, aws_secret_name: str, aws_secrets_manager_endpoint = '') -> dict:
 
         core.CONFIG_TYPE = 'AWS_SECRETS_MANAGER'
         core.CONFIG_SECRET_NAME = aws_secret_name
@@ -71,4 +71,4 @@ class TraktService:
         return response
 
     def get_recommended_movie(self):
-        return random.choice(trakt_movies.get_recommended_movies())
+        return random.choice(TraktMovies.get_recommended_movies())

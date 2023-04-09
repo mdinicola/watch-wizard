@@ -3,7 +3,7 @@ from trakt.utils import slugify
 
 
 class Movie:
-    def __init__(self, data: dict):
+    def __init__(self, data: dict) -> None:
         self.title = data.get('title')
         self.year = data.get('year')
         self.imdb_id = data.get('imdb_id', None)
@@ -36,16 +36,16 @@ class Movie:
         }
         return cls(data)
 
-    def get_availability(self, media_service):
+    def get_availability(self, media_service) -> None:
         results = media_service.search(f'{self.title} + ({self.year})', 'movie', 1)
         if results:
             self.availability = results[0].availability
 
-    def recommendation_message(self):
+    def recommendation_message(self) -> str:
         message = f'You should watch: {self.title} ({self.year}).  {self.availability_message()}'
         return message
     
-    def availability_message(self):
+    def availability_message(self) -> str:
         message = ''
         if self.availability:
             message += f'It is available on: {", ".join(x.title for x in self.availability)}'
@@ -54,7 +54,7 @@ class Movie:
         return message
 
 class Availability:
-    def __init__(self, data: dict):
+    def __init__(self, data: dict) -> None:
         self.platform = data.get('platform')
         self.title = data.get('title')
 

@@ -7,7 +7,7 @@ _logger = logging.getLogger(__name__)
 _config_service = ConfigService.load_config()
 _plex_service = PlexService(_config_service.plex_config)
 
-def health_check(event, context):
+def health_check(event, context) -> dict:
     try:
         plex_status = _plex_service.test_connection()
         data = {

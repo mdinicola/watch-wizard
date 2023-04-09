@@ -6,21 +6,21 @@ import logging
 _logger = logging.getLogger(__name__)
 
 class AlexaService:
-    def __init__(self, skill_id):
+    def __init__(self, skill_id) -> None:
         self._skill_builder = SkillBuilder()
         self._skill_builder.skill_id = skill_id
 
-    def add_request_handlers(self, handlers):
+    def add_request_handlers(self, handlers) -> None:
         for handler in handlers:
             self._skill_builder.add_request_handler(handler)
 
-    def add_exception_handler(self, handler):
+    def add_exception_handler(self, handler) -> None:
         self._skill_builder.add_exception_handler(handler)
 
     def get_lambda_handler(self):
         return self._skill_builder.lambda_handler()
 
-    def get_webservice_handler(self):
+    def get_webservice_handler(self) -> WebserviceSkillHandler:
         # skip verification if testing locally
         if os.environ.get('AWS_SAM_LOCAL') == 'true':
             return WebserviceSkillHandler(skill=self._skill_builder.create(), verify_signature=False, verify_timestamp=False)

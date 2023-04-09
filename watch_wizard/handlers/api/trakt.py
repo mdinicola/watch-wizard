@@ -7,7 +7,7 @@ import logging
 _logger = logging.getLogger(__name__)
 _config_service = ConfigService.load_config()
 
-def get_auth_code(event, context):
+def get_auth_code(event, context) -> dict:
     client_id = _config_service.trakt_config.get('client_id')
     client_secret = _config_service.trakt_config.get('client_secret')
 
@@ -24,7 +24,7 @@ def get_auth_code(event, context):
         'body': json.dumps(response, cls=EnhancedJSONEncoder)
     }
 
-def authenticate_device(event, context):
+def authenticate_device(event, context) -> dict:
     try:
         device_auth_data = json.loads(event['body'])['device_auth_data']
         device_code = device_auth_data['device_code']
