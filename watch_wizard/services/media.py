@@ -16,7 +16,7 @@ class MediaService:
     def recommend_movie(self) -> Movie:
         trakt_movie = self.trakt_service.get_recommended_movie()
         movie: Movie = Movie.from_trakt(trakt_movie)
-        movie.get_availability(movie)
+        movie.get_availability(self)
         return movie
     
     def search(self, query: str, media_type: str, limit: int) -> List[Movie]:
