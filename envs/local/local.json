@@ -1,0 +1,23 @@
+{
+    "RecommendMovieFunction": {
+        "SecretsManagerEndpoint": "http://localstack.internal:4566"
+    },
+    "TraktGetAuthCodeFunction": {
+        "SecretsManagerEndpoint": "http://localstack.internal:4566"
+    },
+    "TraktAuthenticateDeviceFunction": {
+        "SecretsManagerEndpoint": "http://localstack.internal:4566"
+    },
+    "PlexHealthCheckFunction": {
+        "SecretsManagerEndpoint": "http://localstack.internal:4566"
+    },
+    "SearchMediaFunction": {
+        "SecretsManagerEndpoint": "http://localstack.internal:4566"
+    },
+    "AlexaSkillsApiFunction": {
+        "SecretsManagerEndpoint": "http://localstack.internal:4566"
+    },
+    "AlexaSkillsFunction": {
+        "SecretsManagerEndpoint": "http://localstack.internal:4566"
+    }
+}
