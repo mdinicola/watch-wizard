@@ -6,14 +6,15 @@ import logging
 _logger = logging.getLogger(__name__)
 _logger.setLevel(logging.INFO)
 
-_config_service = ConfigService.load_config()
+_config_service = ConfigService()
 
 def get_config(event, context) -> dict:
     try:
         data = {
             'trakt': _config_service.trakt_config,
             'plex': _config_service.plex_config,
-            'alexa': _config_service.alexa_config
+            'alexa': _config_service.alexa_config,
+            'config': _config_service
         }
         return {
             'statusCode': 200,
