@@ -1,4 +1,7 @@
 {
+    "ConfigGetFunction": {
+        "SecretsManagerEndpoint": "http://localstack.internal:4566"
+    },
     "RecommendMovieFunction": {
         "SecretsManagerEndpoint": "http://localstack.internal:4566"
     },

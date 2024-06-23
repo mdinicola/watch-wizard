@@ -102,6 +102,24 @@ Resources:
       KeyType: 'API_KEY'
       UsagePlanId: !Ref UsagePlan
 
+  ConfigGetFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub "${ServiceName}-Config-Get"
+      Role: !GetAtt LambdaRole.Arn
+      CodeUri: watch_wizard/
+      Handler: handlers/api/config.get_config
+      Events:
+        Get:
+          Type: Api
+          Properties:
+            RestApiId:
+              Ref: ApiGatewayApi
+            Path: "/config"
+            Method: get
+            Auth:
+              ApiKeyRequired: true
+
   TraktGetAuthCodeFunction:
     Type: AWS::Serverless::Function
     Properties:
