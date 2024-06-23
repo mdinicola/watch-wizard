@@ -15,9 +15,8 @@ class EnhancedJSONEncoder(json.JSONEncoder):
         try:
             if is_dataclass(o):
                 return asdict(o)
+            if hasattr(o, 'to_json'):
+                return o.to_json()
             return super().default(o)
         except:
-            try:
-                return o.serialize()
-            except:
-                return o.__dict__
+            return o.__dict__
