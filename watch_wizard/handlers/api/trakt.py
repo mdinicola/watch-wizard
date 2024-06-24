@@ -7,23 +7,25 @@ import logging
 _logger = logging.getLogger(__name__)
 _logger.setLevel(logging.INFO)
 
-_config_service = ConfigService.load_config()
+_config_service = ConfigService()
+_trakt_service = TraktService(_config_service.trakt_config)
 
 def get_auth_code(event, context) -> dict:
-    client_id = _config_service.trakt_config.get('client_id')
-    client_secret = _config_service.trakt_config.get('client_secret')
+    try:
+        response = _trakt_service.get_auth_code()
 
-    if client_id is None or client_secret is None:
+        return {
+            'statusCode': 200,
+            'body': json.dumps(response, cls=EnhancedJSONEncoder)
+        }
+    except Exception as e:
+        response = {
+            'message': 'An unknown error has occurred',
+            'error': e
+        }
         return {
             'statusCode': 500,
-            'body': json.dumps({'message': 'Trakt configuration is invalid or not set'})
-        }
-
-    response = TraktService.get_auth_code(client_id, client_secret)
-
-    return {
-        'statusCode': 200,
-        'body': json.dumps(response, cls=EnhancedJSONEncoder)
+            'body': json.dumps(response, cls=EnhancedJSONEncoder)
     }
 
 def authenticate_device(event, context) -> dict:

@@ -1,6 +1,7 @@
 from trakt import core
 from trakt import movies as TraktMovies
 from models import DeviceAuthData
+from services.config import TraktConfig
 import logging
 import time
 import random
@@ -9,16 +10,22 @@ _logger = logging.getLogger(__name__)
 _logger.setLevel(logging.INFO)
 
 class TraktService:
-    def __init__(self, aws_secret_name, aws_secrets_manager_endpoint = '') -> None:
-        core.CONFIG_TYPE = 'AWS_SECRETS_MANAGER'
-        core.CONFIG_SECRET_NAME = aws_secret_name
-        if aws_secrets_manager_endpoint != '':
-            core.AWS_SECRETS_MANAGER_ENDPOINT = aws_secrets_manager_endpoint
-        core.load_config()
+    def __init__(self, config: TraktConfig) -> None:
+        self._config: TraktConfig = config          
+        self._validate_config() 
+        core.CLIENT_ID = config.client_id
+        core.CLIENT_SECRET = config.client_secret
+        core.OAUTH_AUTH = config.oauth_token
+        core.OAUTH_REFRESH = config.oauth_refresh_token
+        core.OAUTH_EXPIRES_AT = config.oauth_expiry_date
 
-    @staticmethod
-    def get_auth_code(client_id: str, client_secret: str) -> dict:
-        response = core.get_device_code(client_id = client_id, client_secret = client_secret)
+    def _validate_config(self) -> None:
+        if self._config.client_id is None or self._config.client_secret is None:
+            raise TypeError('Trakt configuration is invalid or not set')
+
+
+    def get_auth_code(self) -> dict:
+        response = core.get_device_code(client_id = self._config.client_id, client_secret = self._config.client_secret)
         device_auth_data = DeviceAuthData(user_code = response['user_code'], device_code = response['device_code'], 
             verification_url = response['verification_url'], poll_interval = response['interval'])
 
@@ -26,16 +33,7 @@ class TraktService:
             'device_auth_data': device_auth_data
         }
 
-    @staticmethod
-    def authenticate_device(device_code: str, poll_interval: int, aws_secret_name: str, aws_secrets_manager_endpoint = '') -> dict:
-
-        core.CONFIG_TYPE = 'AWS_SECRETS_MANAGER'
-        core.CONFIG_SECRET_NAME = aws_secret_name
-        if aws_secrets_manager_endpoint != '':
-            core.AWS_SECRETS_MANAGER_ENDPOINT = aws_secrets_manager_endpoint
-        
-        core.load_config()
-
+    def authenticate_device(device_code: str, poll_interval: int) -> dict:
         success_message = "You've been successfully authenticated."
 
         error_messages = {
@@ -52,7 +50,7 @@ class TraktService:
 
         while True:
             auth_response = core.get_device_token(device_code = device_code, 
-                client_id = core.CLIENT_ID, client_secret = core.CLIENT_SECRET, store = True)
+                client_id = self._config.client_id, client_secret = self._config.client_secret, store = True)
 
             if auth_response.status_code == 200:
                 response['message'] = success_message
