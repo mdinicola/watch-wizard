@@ -3,6 +3,7 @@ from plexapi.server import PlexServer
 from plexapi.video import Video as PlexVideo
 from plexapi.media import Availability as PlexAvailability
 from models import Availability
+from services.config import PlexConfig
 from utils import distinct
 from typing import List
 import logging
@@ -11,18 +12,16 @@ _logger = logging.getLogger(__name__)
 _logger.setLevel(logging.INFO)
 
 class PlexService:
-    def __init__(self, config: dict) -> None:
-        self._username = config.get('username')
-        self._password = config.get('password')
-        self._server_name = config.get('server_name')
+    def __init__(self, config: PlexConfig) -> None:
+        self._config = config
         self.account = None
         self.server = None
 
     def connect(self) -> None:
         if self.account:
             return
-        self.account = MyPlexAccount(self._username, self._password)
-        self.server: PlexServer = self.account.resource(self._server_name).connect(ssl = True)
+        self.account = MyPlexAccount(self._config.username, self._config.password)
+        self.server: PlexServer = self.account.resource(self._config.server_name).connect(ssl = True)
 
     def test_connection(self) -> bool:
         try:
