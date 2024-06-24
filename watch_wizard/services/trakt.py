@@ -1,5 +1,6 @@
 from trakt import core
 from trakt import movies as TraktMovies
+from trakt import users
 from models import DeviceAuthData
 from services.config import TraktConfig
 import logging
@@ -15,7 +16,7 @@ class TraktService:
         self._validate_config() 
         core.CLIENT_ID = config.client_id
         core.CLIENT_SECRET = config.client_secret
-        core.OAUTH_AUTH = config.oauth_token
+        core.OAUTH_TOKEN = config.oauth_token
         core.OAUTH_REFRESH = config.oauth_refresh_token
         core.OAUTH_EXPIRES_AT = config.oauth_expiry_date
 
@@ -23,6 +24,16 @@ class TraktService:
         if self._config.client_id is None or self._config.client_secret is None:
             raise TypeError('Trakt configuration is invalid or not set')
 
+
+    def _update_config(self, oauth_expiry_date = None) -> None:
+        if core.OAUTH_TOKEN != self._config.oauth_token or core.OAUTH_REFRESH != self._config.oauth_refresh_token:
+            self._config.oauth_token = core.OAUTH_TOKEN
+            self._config.oauth_refresh_token = core.OAUTH_REFRESH
+            if oauth_expiry_date is None:
+                self._config.oauth_expiry_date = core.OAUTH_EXPIRES_AT
+            else:
+                self._config.oauth_expiry_date = oauth_expiry_date
+            self._config.update()
 
     def get_auth_code(self) -> dict:
         response = core.get_device_code(client_id = self._config.client_id, client_secret = self._config.client_secret)
@@ -33,7 +44,7 @@ class TraktService:
             'device_auth_data': device_auth_data
         }
 
-    def authenticate_device(device_code: str, poll_interval: int) -> dict:
+    def authenticate_device(self, device_code: str, poll_interval: int) -> dict:
         success_message = "You've been successfully authenticated."
 
         error_messages = {
@@ -53,6 +64,9 @@ class TraktService:
                 client_id = self._config.client_id, client_secret = self._config.client_secret, store = True)
 
             if auth_response.status_code == 200:
+                auth_data = auth_response.json()
+                oauth_expiry_date = auth_data.get("created_at") + auth_data.get("expires_in")
+                self._update_config(oauth_expiry_date)
                 response['message'] = success_message
                 response['status_code'] = 200
                 break
@@ -69,5 +83,10 @@ class TraktService:
 
         return response
 
+    def connect(self):
+        users.get_user_settings()
+        self._update_config()
+
     def get_recommended_movie(self):
+        self.connect()
         return random.choice(TraktMovies.get_recommended_movies())

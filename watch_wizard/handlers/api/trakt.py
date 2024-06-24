@@ -48,8 +48,7 @@ def authenticate_device(event, context) -> dict:
             })
         }
 
-    response = TraktService.authenticate_device(device_code, poll_interval, _config_service.trakt_config.get('secret_name'), 
-                                                    _config_service.config.get('secrets_manager_endpoint'))
+    response = _trakt_service.authenticate_device(device_code, poll_interval)
 
     return {
         'statusCode': response['status_code'],
