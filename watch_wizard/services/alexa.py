@@ -1,3 +1,4 @@
+from services.config import AlexaConfig
 from ask_sdk_webservice_support.webservice_handler import WebserviceSkillHandler
 from ask_sdk_core.skill_builder import SkillBuilder
 import os
@@ -7,9 +8,10 @@ _logger = logging.getLogger(__name__)
 _logger.setLevel(logging.INFO)
 
 class AlexaService:
-    def __init__(self, skill_id) -> None:
+    def __init__(self, config: AlexaConfig) -> None:
+        self._config = config
         self._skill_builder = SkillBuilder()
-        self._skill_builder.skill_id = skill_id
+        self._skill_builder.skill_id = config.skill_id
 
     def add_request_handlers(self, handlers) -> None:
         for handler in handlers:

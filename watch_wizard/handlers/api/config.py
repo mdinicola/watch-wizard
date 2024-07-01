@@ -1,5 +1,5 @@
+from utils import EnhancedJSONEncoder
 from services.config import ConfigService
-from services.plex import PlexService
 import json
 import logging
 
@@ -7,21 +7,16 @@ _logger = logging.getLogger(__name__)
 _logger.setLevel(logging.INFO)
 
 _config_service = ConfigService()
-_plex_service = PlexService(_config_service.plex_config)
 
-def health_check(event, context) -> dict:
+def get_config(event, context) -> dict:
     try:
-        plex_status = _plex_service.test_connection()
-        data = {
-            'plex': plex_status
-        }
         return {
             'statusCode': 200,
-            'body': json.dumps({'status': data})
+            'body': json.dumps(_config_service, cls=EnhancedJSONEncoder)
         }
     except Exception as e:
         _logger.exception(e)
-        message = 'Plex connection unsuccessful.  See log for details'
+        message = 'Unable to retrieve configuration.  See log for details'
         return {
             'statusCode': 500,
             'body': json.dumps({'message': message})
