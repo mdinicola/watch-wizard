@@ -1,5 +1,7 @@
 from utils import EnhancedJSONEncoder
 from services.config import ConfigService
+from services.trakt import TraktService
+from services.plex import PlexService
 from services.media import MediaService
 from models import Movie
 from typing import List
@@ -9,9 +11,10 @@ import logging
 _logger = logging.getLogger(__name__)
 _logger.setLevel(logging.INFO)
 
-_config_service = ConfigService.load_config()
-_media_service = MediaService(_config_service.trakt_config, _config_service.plex_config, 
-                                _config_service.config.get('secrets_manager_endpoint'))
+_config_service = ConfigService()
+_trakt_service = TraktService(_config_service.trakt_config)
+_plex_service = PlexService(_config_service.plex_config)
+_media_service = MediaService(_trakt_service, _plex_service)
 
 def recommend_movie(event, context) -> dict:
     try:
