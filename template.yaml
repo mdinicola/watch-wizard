@@ -102,6 +102,13 @@ Resources:
       KeyType: 'API_KEY'
       UsagePlanId: !Ref UsagePlan
 
+  DependenciesLayer:
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+      ContentUri: dependencies
+    Metadata:
+      BuildMethod: python3.9
+
   ConfigGetFunction:
     Type: AWS::Serverless::Function
     Properties:
