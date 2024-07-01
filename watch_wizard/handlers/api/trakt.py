@@ -56,3 +56,21 @@ def authenticate_device(event, context) -> dict:
             "message": response['message']
         })
     }
+
+def health_check(event, context) -> dict:
+    try:
+        trakt_status = _trakt_service.test_connection()
+        data = {
+            'trakt': trakt_status
+        }
+        return {
+            'statusCode': 200,
+            'body': json.dumps({'status': data}, cls=EnhancedJSONEncoder)
+        }
+    except Exception as e:
+        _logger.exception(e)
+        message = 'Trakt connection unsuccessful.  See log for details'
+        return {
+            'statusCode': 500,
+            'body': json.dumps({'message': message})
+        }

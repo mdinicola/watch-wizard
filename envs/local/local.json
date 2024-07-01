@@ -11,6 +11,9 @@
     "TraktAuthenticateDeviceFunction": {
         "SecretsManagerEndpoint": "http://localstack.internal:4566"
     },
+    "TraktHealthCheckFunction": {
+        "SecretsManagerEndpoint": "http://localstack.internal:4566"
+    },
     "PlexHealthCheckFunction": {
         "SecretsManagerEndpoint": "http://localstack.internal:4566"
     },

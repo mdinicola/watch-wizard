@@ -66,6 +66,29 @@ paths:
           Fn::Sub: "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${TraktAuthenticateDeviceFunction.Arn}/invocations"
       security:
         - api_key: []
+  "/trakt/health":
+    get:
+      summary: Trakt HealthCheck Function
+      description: Validates connection to Trakt with configured credentials
+      operationId: TraktHealthCheckFunction
+      produces:
+        - application/json
+      responses:
+        200:
+          description: Success
+        404:
+          description: Not found
+        500:
+          description: 500 Internal Server Error
+        503:
+          description: SERVICE UNAVAILABLE
+      x-amazon-apigateway-integration:
+        type: aws_proxy
+        httpMethod: POST
+        uri: 
+          Fn::Sub: "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${TraktHealthCheckFunction.Arn}/invocations"
+      security:
+        - api_key: []
   "/plex/health":
     get:
       summary: Plex HealthCheck Function

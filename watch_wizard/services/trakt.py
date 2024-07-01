@@ -14,11 +14,6 @@ class TraktService:
     def __init__(self, config: TraktConfig) -> None:
         self._config: TraktConfig = config          
         self._validate_config() 
-        core.CLIENT_ID = config.client_id
-        core.CLIENT_SECRET = config.client_secret
-        core.OAUTH_TOKEN = config.oauth_token
-        core.OAUTH_REFRESH = config.oauth_refresh_token
-        core.OAUTH_EXPIRES_AT = config.oauth_expiry_date
 
     def _validate_config(self) -> None:
         if self._config.client_id is None or self._config.client_secret is None:
@@ -84,8 +79,22 @@ class TraktService:
         return response
 
     def connect(self):
+        if core.CLIENT_ID is None:
+            core.CLIENT_ID = self._config.client_id
+            core.CLIENT_SECRET = self._config.client_secret
+            core.OAUTH_TOKEN = self._config.oauth_token
+            core.OAUTH_REFRESH = self._config.oauth_refresh_token
+            core.OAUTH_EXPIRES_AT = self._config.oauth_expiry_date
         users.get_user_settings()
         self._update_config()
+
+    def test_connection(self) -> bool:
+        try:
+            self.connect()
+            return True
+        except Exception as e:
+            _logger.error(e)
+            return False
 
     def get_recommended_movie(self):
         self.connect()

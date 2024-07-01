@@ -146,6 +146,24 @@ Resources:
             Auth:
               ApiKeyRequired: true
 
+  TraktHealthCheckFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub "${ServiceName}-Trakt-HealthCheck"
+      Role: !GetAtt LambdaRole.Arn
+      CodeUri: watch_wizard/
+      Handler: handlers/api/trakt.health_check
+      Events:
+        Get:
+          Type: Api
+          Properties:
+            RestApiId:
+              Ref: ApiGatewayApi
+            Path: "/trakt/health"
+            Method: get
+            Auth:
+              ApiKeyRequired: true
+
   PlexHealthCheckFunction:
     Type: AWS::Serverless::Function
     Properties:
