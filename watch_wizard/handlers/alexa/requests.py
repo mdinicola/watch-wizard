@@ -1,5 +1,7 @@
 from ask_sdk_core.dispatch_components import AbstractRequestHandler, AbstractExceptionHandler
 from services.config import ConfigService
+from services.trakt import TraktService
+from services.plex import PlexService
 from services.media import MediaService, Movie
 import ask_sdk_core.utils as ask_utils
 import logging
