@@ -12,7 +12,7 @@ _logger.setLevel(logging.INFO)
 _config_service = ConfigService()
 _trakt_service = TraktService(_config_service.trakt_config)
 _plex_service = PlexService(_config_service.plex_config)
-_media_service = MediaService(_trakt_service, _media_service)
+_media_service = MediaService(_trakt_service, _plex_service)
 
 ### Define Alexa request handler classes
 
