@@ -3,7 +3,7 @@ Transform: AWS::Serverless-2016-10-31
 Description: SAM template for WatchWizard Application
 Globals:
   Function:
-    Runtime: python3.9
+    Runtime: python3.11
     Layers:
       - !Ref DependenciesLayer
     Timeout: 60
@@ -109,7 +109,7 @@ Resources:
     Properties:
       ContentUri: dependencies
     Metadata:
-      BuildMethod: python3.9
+      BuildMethod: python3.11
 
   ConfigGetFunction:
     Type: AWS::Serverless::Function
