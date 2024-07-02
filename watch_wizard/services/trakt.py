@@ -56,7 +56,7 @@ class TraktService:
 
         while True:
             auth_response = core.get_device_token(device_code = device_code, 
-                client_id = self._config.client_id, client_secret = self._config.client_secret, store = True)
+                client_id = self._config.client_id, client_secret = self._config.client_secret)
 
             if auth_response.status_code == 200:
                 auth_data = auth_response.json()
