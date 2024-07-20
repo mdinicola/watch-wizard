@@ -208,7 +208,7 @@ Resources:
       FunctionName: !Sub "${ServiceName}-SearchMedia"
       Role: !GetAtt LambdaRole.Arn
       CodeUri: watch_wizard/
-      Handler: handlers/api/media.search
+      Handler: handlers/api/media.lambda_handler
       Events:
         Get:
           Type: Api
@@ -226,7 +226,7 @@ Resources:
       FunctionName: !Sub "${ServiceName}-RecommendMovie"
       Role: !GetAtt LambdaRole.Arn
       CodeUri: watch_wizard/
-      Handler: handlers/api/media.recommend_movie
+      Handler: handlers/api/media.lambda_handler
       Events:
         Get:
           Type: Api
