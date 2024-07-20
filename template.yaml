@@ -136,7 +136,7 @@ Resources:
       FunctionName: !Sub "${ServiceName}-Trakt-GetAuthCode"
       Role: !GetAtt LambdaRole.Arn
       CodeUri: watch_wizard/
-      Handler: handlers/api/trakt.get_auth_code
+      Handler: handlers/api/trakt.lambda_handler
       Events:
         Get:
           Type: Api
@@ -154,9 +154,9 @@ Resources:
       FunctionName: !Sub "${ServiceName}-Trakt-AuthenticateDevice"
       Role: !GetAtt LambdaRole.Arn
       CodeUri: watch_wizard/
-      Handler: handlers/api/trakt.authenticate_device
+      Handler: handlers/api/trakt.lambda_handler
       Events:
-        Get:
+        Post:
           Type: Api
           Properties:
             RestApiId:
@@ -172,7 +172,7 @@ Resources:
       FunctionName: !Sub "${ServiceName}-Trakt-HealthCheck"
       Role: !GetAtt LambdaRole.Arn
       CodeUri: watch_wizard/
-      Handler: handlers/api/trakt.health_check
+      Handler: handlers/api/trakt.lambda_handler
       Events:
         Get:
           Type: Api

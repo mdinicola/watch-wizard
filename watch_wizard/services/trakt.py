@@ -1,14 +1,14 @@
+from aws_lambda_powertools import Logger
 from trakt import core
 from trakt import movies as TraktMovies
 from trakt import users
-from models import DeviceAuthData
+from models.trakt import DeviceAuthData
 from services.config import TraktConfig
 import logging
 import time
 import random
 
-_logger = logging.getLogger(__name__)
-_logger.setLevel(logging.INFO)
+_logger = Logger()
 
 class TraktService:
     def __init__(self, config: TraktConfig) -> None:
@@ -39,7 +39,8 @@ class TraktService:
             'device_auth_data': device_auth_data
         }
 
-    def authenticate_device(self, device_code: str, poll_interval: int) -> dict:
+    def authenticate_device(self, device_auth_data: DeviceAuthData) -> dict:
+        poll_interval = device_auth_data.poll_interval
         success_message = "You've been successfully authenticated."
 
         error_messages = {
@@ -55,7 +56,7 @@ class TraktService:
         }
 
         while True:
-            auth_response = core.get_device_token(device_code = device_code, 
+            auth_response = core.get_device_token(device_code = device_auth_data.device_code, 
                 client_id = self._config.client_id, client_secret = self._config.client_secret)
 
             if auth_response.status_code == 200:
