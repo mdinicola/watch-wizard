@@ -10,6 +10,9 @@ def distinct(sequence: list, key: str):
             yield s
     return seen
 
+def enhanced_json_serializer(obj) -> str:
+    return json.dumps(obj, cls=EnhancedJSONEncoder)
+
 class EnhancedJSONEncoder(json.JSONEncoder):
     def default(self, o):
         try:

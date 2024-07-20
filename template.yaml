@@ -6,12 +6,13 @@ Globals:
     Runtime: python3.11
     Layers:
       - !Ref DependenciesLayer
+      - arn:aws:lambda:ca-central-1:017000801446:layer:AWSLambdaPowertoolsPythonV2:76
     Timeout: 60
     Environment:
       Variables:
-        ServiceName: !Ref ServiceName
+        POWERTOOLS_SERVICE_NAME: !Ref ServiceName
+        POWERTOOLS_LOG_LEVEL: INFO
         ServiceSecretName: !Sub "apps/${ServiceName}"
-        TraktSecretName: !Sub "apps/${ServiceName}-Trakt"
         SecretsManagerEndpoint: ""
 Parameters:
   ServiceName:
@@ -117,7 +118,17 @@ Resources:
       FunctionName: !Sub "${ServiceName}-Config-Get"
       Role: !GetAtt LambdaRole.Arn
       CodeUri: watch_wizard/
-      Handler: handlers/api/config.get_config
+      Handler: handlers/api/config.lambda_handler
+      Events:
+        Get:
+          Type: Api
+          Properties:
+            RestApiId:
+              Ref: ApiGatewayApi
+            Path: "/config"
+            Method: get
+            Auth:
+              ApiKeyRequired: true
 
   TraktGetAuthCodeFunction:
     Type: AWS::Serverless::Function

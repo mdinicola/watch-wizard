@@ -1,23 +1,44 @@
-from utils import EnhancedJSONEncoder
+from aws_lambda_powertools import Logger
+from aws_lambda_powertools.utilities.typing import LambdaContext
+from aws_lambda_powertools.event_handler import APIGatewayRestResolver, Response, content_types
+
+from http import HTTPStatus
+
+from utils import enhanced_json_serializer
 from services.config import ConfigService
-import json
-import logging
 
-_logger = logging.getLogger(__name__)
-_logger.setLevel(logging.INFO)
+logger = Logger()
+app = APIGatewayRestResolver(serializer = enhanced_json_serializer)
 
-_config_service = ConfigService()
+config_service = None
 
-def get_config(event, context) -> dict:
-    try:
-        return {
-            'statusCode': 200,
-            'body': json.dumps(_config_service, cls=EnhancedJSONEncoder)
+def lambda_handler(event: dict, context: LambdaContext) -> dict:
+    return app.resolve(event, context)
+
+
+def init():
+    global config_service
+    if config_service is None:
+        config_service = ConfigService()
+
+
+@app.get('/config')
+def get_config() -> dict:
+    init()
+    return config_service   
+
+
+## Error Handling
+
+@app.exception_handler(Exception)
+def handle_exception(e: Exception):
+    logger.exception(e)
+    return Response(
+        status_code = HTTPStatus.INTERNAL_SERVER_ERROR,
+        content_type = content_types.APPLICATION_JSON,
+        body = {
+            'error': {
+                'msg': str(e)
+            }
         }
-    except Exception as e:
-        _logger.exception(e)
-        message = 'Unable to retrieve configuration.  See log for details'
-        return {
-            'statusCode': 500,
-            'body': json.dumps({'message': message})
-        }
+    )

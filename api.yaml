@@ -6,6 +6,29 @@ info:
   version: 1.0.0
 basePath: "/"
 paths:
+  "/config":
+    get:
+      summary: Config Get Function
+      description: Gets the application configuration
+      operationId: ConfigGetFunction
+      produces:
+        - application/json
+      responses:
+        200:
+          description: Success
+        404:
+          description: Not found
+        500:
+          description: 500 Internal Server Error
+        503:
+          description: SERVICE UNAVAILABLE
+      x-amazon-apigateway-integration:
+        type: aws_proxy
+        httpMethod: POST
+        uri: 
+          Fn::Sub: "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ConfigGetFunction.Arn}/invocations"
+      security:
+        - api_key: []
   "/trakt/auth-code":
     get:
       summary: Trakt GetAuthCode Function
