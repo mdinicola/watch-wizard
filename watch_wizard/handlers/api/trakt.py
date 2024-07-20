@@ -1,6 +1,7 @@
 from aws_lambda_powertools import Logger
 from aws_lambda_powertools.utilities.typing import LambdaContext
 from aws_lambda_powertools.event_handler import APIGatewayRestResolver, Response, content_types
+from aws_lambda_powertools.event_handler.openapi.exceptions import RequestValidationError, ValidationException
 
 from http import HTTPStatus
 
@@ -51,7 +52,7 @@ def get_auth_code() -> dict:
 
 
 @app.post('/trakt/authenticate-device')
-def authenticate_device(device_auth_data: DeviceAuthData) -> Response:
+def authenticate_device(device_auth_data: DeviceAuthData):
     init()
     device_code = device_auth_data.device_code
     poll_interval = device_auth_data.poll_interval
@@ -62,11 +63,23 @@ def authenticate_device(device_auth_data: DeviceAuthData) -> Response:
         status_code = response['status_code'],
         content_type = content_types.APPLICATION_JSON,
         body = {
-            'msg': response['message']
+            'msg': response['msg']
         }
     )
 
 ## Error Handling
+
+@app.exception_handler(RequestValidationError)
+@app.exception_handler(ValidationException)
+def handle_validation_error(e: ValidationException):
+    logger.error(e.errors())
+    return Response(
+        status_code = HTTPStatus.BAD_REQUEST,
+        content_type = content_types.APPLICATION_JSON,
+        body = {
+            'errors': e.errors()
+        }
+    )
 
 @app.exception_handler(Exception)
 def handle_exception(e: Exception):

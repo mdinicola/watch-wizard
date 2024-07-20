@@ -30,17 +30,14 @@ class TraktService:
                 self._config.oauth_expiry_date = oauth_expiry_date
             self._config.update()
 
-    def get_auth_code(self) -> dict:
+    def get_auth_code(self) -> DeviceAuthData:
         response = core.get_device_code(client_id = self._config.client_id, client_secret = self._config.client_secret)
-        device_auth_data = DeviceAuthData(user_code = response['user_code'], device_code = response['device_code'], 
+        return DeviceAuthData(user_code = response['user_code'], device_code = response['device_code'], 
             verification_url = response['verification_url'], poll_interval = response['interval'])
-
-        return {
-            'device_auth_data': device_auth_data
-        }
 
     def authenticate_device(self, device_auth_data: DeviceAuthData) -> dict:
         poll_interval = device_auth_data.poll_interval
+
         success_message = "You've been successfully authenticated."
 
         error_messages = {
@@ -51,7 +48,7 @@ class TraktService:
         }
 
         response = {
-            'message': 'Something went wrong.  Please try again',
+            'msg': 'Something went wrong.  Please try again',
             'status_code': 500
         }
 
@@ -63,7 +60,7 @@ class TraktService:
                 auth_data = auth_response.json()
                 oauth_expiry_date = auth_data.get("created_at") + auth_data.get("expires_in")
                 self._update_config(oauth_expiry_date)
-                response['message'] = success_message
+                response['msg'] = success_message
                 response['status_code'] = 200
                 break
 
@@ -71,7 +68,7 @@ class TraktService:
                 poll_interval *= 2
 
             elif auth_response.status_code != 400:  # not pending
-                response['message'] = error_messages.get(auth_response.status_code, auth_response.reason)
+                response['msg'] = error_messages.get(auth_response.status_code, auth_response.reason)
                 response['status_code'] = auth_response.status_code
                 break
 
