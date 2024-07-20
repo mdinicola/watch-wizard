@@ -1,10 +1,9 @@
+from aws_lambda_powertools import Logger
 import os
 import json
-import logging
 import boto3
 
-_logger = logging.getLogger(__name__)
-_logger.setLevel(logging.INFO)
+_logger = Logger()
 
 class SecretsManagerSecret:
     def __init__(self, client, secret_name) -> None:
