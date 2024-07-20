@@ -1,15 +1,13 @@
+from aws_lambda_powertools import Logger
 from plexapi.myplex import MyPlexAccount
 from plexapi.server import PlexServer
 from plexapi.video import Video as PlexVideo
 from plexapi.media import Availability as PlexAvailability
-from models import Availability
+from models.media import Availability
 from services.config import PlexConfig
 from utils import distinct
-from typing import List
-import logging
 
-_logger = logging.getLogger(__name__)
-_logger.setLevel(logging.INFO)
+_logger = Logger()
 
 class PlexService:
     def __init__(self, config: PlexConfig) -> None:
@@ -32,9 +30,9 @@ class PlexService:
             _logger.error(e)
         return False
     
-    def search_media(self, query: str, media_type: str, limit: int = 1) -> List[PlexVideo]:
+    def search_media(self, query: str, media_type: str, limit: int = 1) -> list[PlexVideo]:
         self.connect()
-        results: List[PlexVideo] = self.account.searchDiscover(query, limit, media_type)
+        results: list[PlexVideo] = self.account.searchDiscover(query, limit, media_type)
         return results
 
     def get_plex_availability(self, media: PlexVideo) -> Availability:
@@ -46,9 +44,9 @@ class PlexService:
             })
         return None
     
-    def get_media_availability(self, media: PlexVideo) -> List[Availability]:
+    def get_media_availability(self, media: PlexVideo) -> list[Availability]:
         self.connect()
-        availability: List[Availability] = []
+        availability: list[Availability] = []
 
         # Check if media is available in Plex library
         plex_availability = self.get_plex_availability((media))
@@ -56,11 +54,11 @@ class PlexService:
             availability.append(plex_availability)
 
         # Check if media is available on any streaming services
-        streaming_services: List[PlexAvailability] = media.streamingServices()
+        streaming_services: list[PlexAvailability] = media.streamingServices()
         if (len(streaming_services) > 0):
-            subscription_streaming_services: List[PlexAvailability] = list(filter(lambda x: x.offerType == "subscription", streaming_services))
+            subscription_streaming_services: list[PlexAvailability] = list(filter(lambda x: x.offerType == "subscription", streaming_services))
             distinct_streaming_services = distinct(subscription_streaming_services, 'platform')
-            subscription_availability: List[Availability] = list(map(Availability.from_plex, distinct_streaming_services))
+            subscription_availability: list[Availability] = list(map(Availability.from_plex, distinct_streaming_services))
             availability.extend(subscription_availability)
 
         return availability

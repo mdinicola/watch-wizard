@@ -1,4 +1,3 @@
-from dataclasses import dataclass
 from trakt.utils import slugify
 
 class Movie:
@@ -64,10 +63,3 @@ class Availability:
             'title': plex_availability.title
         }
         return cls(data)
-    
-@dataclass
-class DeviceAuthData:
-    user_code: str
-    device_code: str
-    verification_url: str
-    poll_interval: int

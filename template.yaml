@@ -190,7 +190,7 @@ Resources:
       FunctionName: !Sub "${ServiceName}-Plex-HealthCheck"
       Role: !GetAtt LambdaRole.Arn
       CodeUri: watch_wizard/
-      Handler: handlers/api/plex.health_check
+      Handler: handlers/api/plex.lambda_handler
       Events:
         Get:
           Type: Api

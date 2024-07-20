@@ -1,9 +1,8 @@
+from aws_lambda_powertools import Logger
 from services.aws_secrets_manager import SecretsManagerService, SecretsManagerSecret
 import os
-import logging
 
-_logger = logging.getLogger(__name__)
-_logger.setLevel(logging.INFO)
+_logger = Logger()
 
 _CONFIG_SECRET_NAME_KEY = 'ServiceSecretName'
 
