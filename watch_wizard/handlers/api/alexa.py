@@ -12,10 +12,10 @@ app = APIGatewayRestResolver()
 def lambda_handler(event: dict, context: LambdaContext) -> dict:
     return app.resolve(event, context)
 
-@app.get('/alexa/skills')
+@app.post('/alexa/skills')
 def handle_skill_request() -> dict:
     handler = alexa_service().get_webservice_handler()
-    response = handler.verify_request_and_dispatch(event['headers'], event['body'])
+    response = handler.verify_request_and_dispatch(app.current_event.headers, app.current_event.body)
    
     return response
 
