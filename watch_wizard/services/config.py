@@ -1,5 +1,6 @@
 from aws_lambda_powertools import Logger
-from services.aws_secrets_manager import SecretsManagerService, SecretsManagerSecret
+from services.aws_secrets_manager import SecretsManagerService
+from models.secret import Secret
 import os
 
 _logger = Logger()
@@ -7,10 +8,9 @@ _logger = Logger()
 _CONFIG_SECRET_NAME_KEY = 'ServiceSecretName'
 
 class ConfigService:
-    _secrets_manager_service = SecretsManagerService()
-
     def __init__(self) -> None:
-        config_secret: SecretsManagerSecret = ConfigService._secrets_manager_service.get_secret(os.environ[_CONFIG_SECRET_NAME_KEY])
+        secrets_manager_service = SecretsManagerService()
+        config_secret: Secret = secrets_manager_service.get_secret(secret_name = os.environ[_CONFIG_SECRET_NAME_KEY])
 
         self.trakt_config = TraktConfig(config_secret)
         self.plex_config = PlexConfig(config_secret)
@@ -24,8 +24,8 @@ class ConfigService:
         }
 
 class TraktConfig:
-    def __init__(self, config_secret: SecretsManagerSecret) -> None:
-        self._config_secret = config_secret            
+    def __init__(self, config_secret: Secret) -> None:
+        self._config_secret = config_secret
         self.client_id = config_secret.get_value('TraktClientId')
         self.client_secret = config_secret.get_value('TraktClientSecret')
         self.oauth_token = config_secret.get_value('TraktOauthToken')
@@ -33,7 +33,7 @@ class TraktConfig:
         self.oauth_expiry_date = config_secret.get_value('TraktOauthExpiryDate')
 
     def update(self) -> None:
-        self._config_secret.put_values(TraktOauthToken = self.oauth_token, 
+        self._config_secret.set_values(TraktOauthToken = self.oauth_token, 
             TraktOauthRefreshToken = self.oauth_refresh_token, TraktOauthExpiryDate = self.oauth_expiry_date)
 
     def to_json(self) -> dict:
@@ -46,7 +46,7 @@ class TraktConfig:
         }
 
 class PlexConfig:
-    def __init__(self, config_secret: SecretsManagerSecret) -> None:
+    def __init__(self, config_secret: Secret) -> None:
         self._config_secret = config_secret
         self.username = config_secret.get_value('PlexUsername')
         self.password = config_secret.get_value('PlexPassword')
@@ -63,7 +63,7 @@ class PlexConfig:
         }
 
 class AlexaConfig:
-    def __init__(self, config_secret: SecretsManagerSecret) -> None:
+    def __init__(self, config_secret: Secret) -> None:
         self._config_secret = config_secret
         self.skill_id = config_secret.get_value('AlexaSkillId')
 
