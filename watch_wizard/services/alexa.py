@@ -1,11 +1,11 @@
+from aws_lambda_powertools import Logger
 from services.config import AlexaConfig
 from ask_sdk_webservice_support.webservice_handler import WebserviceSkillHandler
 from ask_sdk_core.skill_builder import SkillBuilder
 import os
 import logging
 
-_logger = logging.getLogger(__name__)
-_logger.setLevel(logging.INFO)
+_logger = Logger()
 
 class AlexaService:
     def __init__(self, config: AlexaConfig) -> None:

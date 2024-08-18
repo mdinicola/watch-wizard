@@ -1,18 +1,17 @@
+from aws_lambda_powertools import Logger
 from ask_sdk_core.dispatch_components import AbstractRequestHandler, AbstractExceptionHandler
 from services.config import ConfigService
 from services.trakt import TraktService
 from services.plex import PlexService
 from services.media import MediaService, Movie
 import ask_sdk_core.utils as ask_utils
-import logging
 
-_logger = logging.getLogger(__name__)
-_logger.setLevel(logging.INFO)
+logger = Logger()
 
-_config_service = ConfigService()
-_trakt_service = TraktService(_config_service.trakt_config)
-_plex_service = PlexService(_config_service.plex_config)
-_media_service = MediaService(_trakt_service, _plex_service)
+config_service = ConfigService()
+trakt_service = TraktService(config_service.trakt_config)
+plex_service = PlexService(config_service.plex_config)
+media_service = MediaService(trakt_service, plex_service)
 
 ### Define Alexa request handler classes
 
@@ -37,7 +36,7 @@ class MovieRecommendationIntentHandler(AbstractRequestHandler):
         return ask_utils.is_intent_name("MovieRecommendationIntent")(handler_input)
 
     def handle(self, handler_input):
-        movie: Movie = _media_service.recommend_movie()
+        movie: Movie = media_service.recommend_movie()
         message = movie.recommendation_message()
         speak_output = message
 
@@ -64,7 +63,7 @@ class MovieAvailabilityIntentHandler(AbstractRequestHandler):
             year = year_slot_values[0]
             movie_title += f' ({year})'
 
-        movie_list = _media_service.search(movie_title, 'movie', 1)
+        movie_list = media_service.search(movie_title, 'movie', 1)
         if movie_list:
             movie: Movie = movie_list[0]
             message = f'Found movie: {movie.title} ({movie.year}).  {movie.availability_message()}'
@@ -149,7 +148,7 @@ class CatchAllExceptionHandler(AbstractExceptionHandler):
         return True
 
     def handle(self, handler_input, exception):
-        _logger.error(exception, exc_info=True)
+        logger.exception(exception)
 
         speak_output = "Sorry, I had trouble doing what you asked. Please try again."
 

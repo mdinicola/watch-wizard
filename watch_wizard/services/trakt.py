@@ -1,14 +1,14 @@
+from aws_lambda_powertools import Logger
 from trakt import core
 from trakt import movies as TraktMovies
 from trakt import users
-from models import DeviceAuthData
+from models.trakt import DeviceAuthData
 from services.config import TraktConfig
 import logging
 import time
 import random
 
-_logger = logging.getLogger(__name__)
-_logger.setLevel(logging.INFO)
+_logger = Logger()
 
 class TraktService:
     def __init__(self, config: TraktConfig) -> None:
@@ -21,7 +21,7 @@ class TraktService:
 
 
     def _update_config(self, oauth_expiry_date = None) -> None:
-        if core.OAUTH_TOKEN != self._config.oauth_token or core.OAUTH_REFRESH != self._config.oauth_refresh_token:
+        if core.OAUTH_TOKEN != self._config.oauth_token.get_secret_value() or core.OAUTH_REFRESH != self._config.oauth_refresh_token.get_secret_value():
             self._config.oauth_token = core.OAUTH_TOKEN
             self._config.oauth_refresh_token = core.OAUTH_REFRESH
             if oauth_expiry_date is None:
@@ -30,16 +30,14 @@ class TraktService:
                 self._config.oauth_expiry_date = oauth_expiry_date
             self._config.update()
 
-    def get_auth_code(self) -> dict:
-        response = core.get_device_code(client_id = self._config.client_id, client_secret = self._config.client_secret)
-        device_auth_data = DeviceAuthData(user_code = response['user_code'], device_code = response['device_code'], 
+    def get_auth_code(self) -> DeviceAuthData:
+        response = core.get_device_code(client_id = self._config.client_id, client_secret = self._config.client_secret.get_secret_value())
+        return DeviceAuthData(user_code = response['user_code'], device_code = response['device_code'], 
             verification_url = response['verification_url'], poll_interval = response['interval'])
 
-        return {
-            'device_auth_data': device_auth_data
-        }
+    def authenticate_device(self, device_auth_data: DeviceAuthData) -> dict:
+        poll_interval = device_auth_data.poll_interval
 
-    def authenticate_device(self, device_code: str, poll_interval: int) -> dict:
         success_message = "You've been successfully authenticated."
 
         error_messages = {
@@ -50,19 +48,19 @@ class TraktService:
         }
 
         response = {
-            'message': 'Something went wrong.  Please try again',
+            'msg': 'Something went wrong.  Please try again',
             'status_code': 500
         }
 
         while True:
-            auth_response = core.get_device_token(device_code = device_code, 
-                client_id = self._config.client_id, client_secret = self._config.client_secret)
+            auth_response = core.get_device_token(device_code = device_auth_data.device_code, 
+                client_id = self._config.client_id, client_secret = self._config.client_secret.get_secret_value())
 
             if auth_response.status_code == 200:
                 auth_data = auth_response.json()
                 oauth_expiry_date = auth_data.get("created_at") + auth_data.get("expires_in")
                 self._update_config(oauth_expiry_date)
-                response['message'] = success_message
+                response['msg'] = success_message
                 response['status_code'] = 200
                 break
 
@@ -70,7 +68,7 @@ class TraktService:
                 poll_interval *= 2
 
             elif auth_response.status_code != 400:  # not pending
-                response['message'] = error_messages.get(auth_response.status_code, auth_response.reason)
+                response['msg'] = error_messages.get(auth_response.status_code, auth_response.reason)
                 response['status_code'] = auth_response.status_code
                 break
 
@@ -81,9 +79,9 @@ class TraktService:
     def connect(self):
         if core.CLIENT_ID is None:
             core.CLIENT_ID = self._config.client_id
-            core.CLIENT_SECRET = self._config.client_secret
-            core.OAUTH_TOKEN = self._config.oauth_token
-            core.OAUTH_REFRESH = self._config.oauth_refresh_token
+            core.CLIENT_SECRET = self._config.client_secret.get_secret_value()
+            core.OAUTH_TOKEN = self._config.oauth_token.get_secret_value()
+            core.OAUTH_REFRESH = self._config.oauth_refresh_token.get_secret_value()
             core.OAUTH_EXPIRES_AT = self._config.oauth_expiry_date
         users.get_user_settings()
         self._update_config()

@@ -1,76 +1,95 @@
-from utils import EnhancedJSONEncoder
+from aws_lambda_powertools import Logger
+from aws_lambda_powertools.utilities.typing import LambdaContext
+from aws_lambda_powertools.event_handler import APIGatewayRestResolver, Response, content_types
+from aws_lambda_powertools.event_handler.openapi.exceptions import RequestValidationError, ValidationException
+
+from http import HTTPStatus
+
+from utils import enhanced_json_serializer
+from models.trakt import DeviceAuthData
 from services.config import ConfigService
 from services.trakt import TraktService
-import json
-import logging
 
-_logger = logging.getLogger(__name__)
-_logger.setLevel(logging.INFO)
+logger = Logger()
+app = APIGatewayRestResolver(enable_validation = True, serializer = enhanced_json_serializer)
 
-_config_service = ConfigService()
-_trakt_service = TraktService(_config_service.trakt_config)
+config_service = None
+trakt_service = None
 
-def get_auth_code(event, context) -> dict:
+def lambda_handler(event: dict, context: LambdaContext) -> dict:
+    return app.resolve(event, context)
+
+
+def init():
+    global config_service, trakt_service
+
+    if config_service is None:
+        config_service = ConfigService()
+    if trakt_service is None:
+        trakt_service = TraktService(config_service.trakt_config)
+
+
+@app.get('/trakt/health')
+def health_check() -> dict:
+    init()
     try:
-        response = _trakt_service.get_auth_code()
-
-        return {
-            'statusCode': 200,
-            'body': json.dumps(response, cls=EnhancedJSONEncoder)
-        }
-    except Exception as e:
-        response = {
-            'message': 'An unknown error has occurred',
-            'error': e
-        }
-        return {
-            'statusCode': 500,
-            'body': json.dumps(response, cls=EnhancedJSONEncoder)
-    }
-
-def authenticate_device(event, context) -> dict:
-    try:
-        device_auth_data = json.loads(event['body'])['device_auth_data']
-        device_code = device_auth_data['device_code']
-        poll_interval = device_auth_data['poll_interval']
-    except (KeyError, ValueError):
-        return {
-            'statusCode': 400,
-            'body': json.dumps({
-                'message': 'Request must include valid device_auth_data'
-            })
-        }
-    except:
-        return {
-            'statusCode': 400,
-            'body': json.dumps({
-                'message': 'Malformed request'
-            })
-        }
-
-    response = _trakt_service.authenticate_device(device_code, poll_interval)
-
-    return {
-        'statusCode': response['status_code'],
-        'body': json.dumps({
-            "message": response['message']
-        })
-    }
-
-def health_check(event, context) -> dict:
-    try:
-        trakt_status = _trakt_service.test_connection()
         data = {
-            'trakt': trakt_status
+            'trakt': trakt_service.test_connection()
         }
-        return {
-            'statusCode': 200,
-            'body': json.dumps({'status': data}, cls=EnhancedJSONEncoder)
-        }
+        return data
     except Exception as e:
-        _logger.exception(e)
-        message = 'Trakt connection unsuccessful.  See log for details'
-        return {
-            'statusCode': 500,
-            'body': json.dumps({'message': message})
+        data = {
+            'trakt': False,
+            'msg': str(e)
         }
+        return data
+
+
+@app.get('/trakt/auth-code')
+def get_auth_code() -> dict:
+    init()
+    return trakt_service.get_auth_code()
+
+
+@app.post('/trakt/authenticate-device')
+def authenticate_device(device_auth_data: DeviceAuthData):
+    init()
+    device_code = device_auth_data.device_code
+    poll_interval = device_auth_data.poll_interval
+
+    response = trakt_service.authenticate_device(device_auth_data)
+
+    return Response(
+        status_code = response['status_code'],
+        content_type = content_types.APPLICATION_JSON,
+        body = {
+            'msg': response['msg']
+        }
+    )
+
+## Error Handling
+
+@app.exception_handler(RequestValidationError)
+@app.exception_handler(ValidationException)
+def handle_validation_error(e: ValidationException):
+    logger.error(e.errors())
+    return Response(
+        status_code = HTTPStatus.BAD_REQUEST,
+        content_type = content_types.APPLICATION_JSON,
+        body = {
+            'errors': e.errors()
+        }
+    )
+
+@app.exception_handler(Exception)
+def handle_exception(e: Exception):
+    logger.exception(e)
+    return Response(
+        status_code = HTTPStatus.INTERNAL_SERVER_ERROR,
+        content_type = content_types.APPLICATION_JSON,
+        body = {
+            'error': {
+                'msg': str(e)
+            }
+        }
+    )
