@@ -33,6 +33,7 @@ def health_check() -> dict:
         data = {
             'plex': plex_service.test_connection()
         }
+        
         return data
     except Exception as e:
         data = {
