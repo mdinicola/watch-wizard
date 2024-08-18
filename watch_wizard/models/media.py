@@ -1,41 +1,44 @@
+from pydantic import BaseModel
+from typing import Optional
 from trakt.utils import slugify
 
-class Movie:
-    def __init__(self, data: dict) -> None:
-        self.title = data.get('title')
-        self.year = data.get('year')
-        self.imdb_id = data.get('imdb_id', None)
-        self.trakt_id = data.get('trakt_id', None)
-        self.plex_id = data.get('plex_id', None)
-        self.availability = data.get('availability', [])
-        slug = data.get('slug', None)
-        if slug is not None:
-            self.slug = slug
-        else:
+class Availability(BaseModel):
+    platform: str
+    title: str
+
+    @classmethod
+    def from_plex(cls, plex_availability):
+        return cls(platform = plex_availability.platform, title = plex_availability.title)
+
+class Movie(BaseModel):
+    title: str
+    year: Optional[str] = None
+    imdb_id: Optional[str] = None
+    trakt_id: Optional[str] = None
+    plex_id: Optional[str] = None
+    availability: Optional[list[Availability]] = []
+    slug: Optional[str] = None
+
+    def model_post_init(self, __context):
+        if self.slug is None:
             self.slug = slugify('-'.join([self.title, str(self.year)]))
 
     @classmethod
     def from_trakt(cls, trakt_movie):
-        data = {
-            'title': trakt_movie.title,
-            'year': trakt_movie.year,
-            'imdb_id': trakt_movie.imdb,
-            'trakt_id': trakt_movie.trakt,
-            'slug': trakt_movie.slug
-        }
-        return cls(data)
+        return cls(title = trakt_movie.title,
+            year = trakt_movie.year,
+            imdb_id = trakt_movie.imdb,
+            trakt_id = trakt_movie.trakt,
+            slug = trakt_movie.slug)
 
     @classmethod
     def from_plex(cls, plex_movie):
-        data = {
-            'title': plex_movie.title,
-            'year': plex_movie.year,
-            'plex_id': plex_movie.guid
-        }
-        return cls(data)
+        return cls(title = plex_movie.title,
+            year = plex_movie.year,
+            plex_id = plex_movie.guid)
 
     def get_availability(self, media_service) -> None:
-        results = media_service.search(f'{self.title} + ({self.year})', 'movie', 1)
+        results = media_service.search(query = f'{self.title} + ({self.year})', media_type = 'movie', limit = 1)
         if results:
             self.availability = results[0].availability
 
@@ -50,16 +53,3 @@ class Movie:
         else:
             message += 'It is not available in your library or on any streaming services'
         return message
-
-class Availability:
-    def __init__(self, data: dict) -> None:
-        self.platform = data.get('platform')
-        self.title = data.get('title')
-
-    @classmethod
-    def from_plex(cls, plex_availability):
-        data = {
-            'platform': plex_availability.platform,
-            'title': plex_availability.title
-        }
-        return cls(data)

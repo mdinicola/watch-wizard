@@ -23,8 +23,8 @@ class MediaService:
         if (len(results) == 0):
             return media_list
 
-        platform_exclusions = ['netflix-basic-with-ads']
-        for media in results:
+        platform_exclusions = ['netflix-basic-with-ads', 'amazon-prime-video-with-ads']
+        for media in results[:limit]:
             availability_list: list[Availability] = self._plex_service.get_media_availability(media)
             availability: list[Availability] = list(filter(lambda x: x.platform not in platform_exclusions, availability_list))
             movie: Movie = Movie.from_plex(media)

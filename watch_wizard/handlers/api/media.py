@@ -23,7 +23,7 @@ trakt_service = None
 plex_service = None
 media_service = None
 
-def lambda_handler(event: dict, context: LambdaContext) -> dict:
+def lambda_handler(event: dict, context: LambdaContext):
     return app.resolve(event, context)
 
 
@@ -49,15 +49,14 @@ def recommend_movie():
 @app.get('/media/search')
 def search(title: Annotated[str, Query()], 
     year: Annotated[Optional[str], Query()] = '', 
-    search_type: Annotated[Optional[str], Query(pattern = '^(movie|tvshow)$', alias = 'type')] = 'movie', 
+    media_type: Annotated[Optional[str], Query(pattern = '^(movie|tvshow)$', alias = 'type')] = 'movie', 
     limit: Annotated[Optional[int], Query()] = 1):
         init()
         query = f'{title}'
         if year != '':
             query = f'{title} ({year})'
 
-        media_list: list[Movie] = media_service.search(query, search_type, limit)
-        return media_list
+        return media_service.search(query, media_type, limit)
 
 ## Error Handling
 
