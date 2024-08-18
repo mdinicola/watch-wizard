@@ -38,10 +38,7 @@ class PlexService:
     def get_plex_availability(self, media: PlexVideo) -> Availability:
         plex_results = self.server.search(f'{media.title}')
         if plex_results:
-            return Availability({
-                'platform': 'plex',
-                'title': 'Plex'
-            })
+            return Availability(platform = 'plex', title = 'Plex')
         return None
     
     def get_media_availability(self, media: PlexVideo) -> list[Availability]:

@@ -23,9 +23,9 @@ def init():
 
 
 @app.get('/config')
-def get_config() -> dict:
+def get_config():
     init()
-    return config_service   
+    return config_service
 
 
 ## Error Handling
