@@ -21,7 +21,7 @@ class TraktService:
 
 
     def _update_config(self, oauth_expiry_date = None) -> None:
-        if core.OAUTH_TOKEN != self._config.oauth_token or core.OAUTH_REFRESH != self._config.oauth_refresh_token:
+        if core.OAUTH_TOKEN != self._config.oauth_token.get_secret_value() or core.OAUTH_REFRESH != self._config.oauth_refresh_token.get_secret_value():
             self._config.oauth_token = core.OAUTH_TOKEN
             self._config.oauth_refresh_token = core.OAUTH_REFRESH
             if oauth_expiry_date is None:
@@ -31,7 +31,7 @@ class TraktService:
             self._config.update()
 
     def get_auth_code(self) -> DeviceAuthData:
-        response = core.get_device_code(client_id = self._config.client_id, client_secret = self._config.client_secret)
+        response = core.get_device_code(client_id = self._config.client_id, client_secret = self._config.client_secret.get_secret_value())
         return DeviceAuthData(user_code = response['user_code'], device_code = response['device_code'], 
             verification_url = response['verification_url'], poll_interval = response['interval'])
 
@@ -54,7 +54,7 @@ class TraktService:
 
         while True:
             auth_response = core.get_device_token(device_code = device_auth_data.device_code, 
-                client_id = self._config.client_id, client_secret = self._config.client_secret)
+                client_id = self._config.client_id, client_secret = self._config.client_secret.get_secret_value())
 
             if auth_response.status_code == 200:
                 auth_data = auth_response.json()
@@ -79,9 +79,9 @@ class TraktService:
     def connect(self):
         if core.CLIENT_ID is None:
             core.CLIENT_ID = self._config.client_id
-            core.CLIENT_SECRET = self._config.client_secret
-            core.OAUTH_TOKEN = self._config.oauth_token
-            core.OAUTH_REFRESH = self._config.oauth_refresh_token
+            core.CLIENT_SECRET = self._config.client_secret.get_secret_value()
+            core.OAUTH_TOKEN = self._config.oauth_token.get_secret_value()
+            core.OAUTH_REFRESH = self._config.oauth_refresh_token.get_secret_value()
             core.OAUTH_EXPIRES_AT = self._config.oauth_expiry_date
         users.get_user_settings()
         self._update_config()

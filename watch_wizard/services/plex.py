@@ -18,7 +18,7 @@ class PlexService:
     def connect(self) -> None:
         if self.account:
             return
-        self.account = MyPlexAccount(self._config.username, self._config.password)
+        self.account = MyPlexAccount(self._config.username.get_secret_value(), self._config.password.get_secret_value())
         self.server: PlexServer = self.account.resource(self._config.server_name).connect(ssl = True)
 
     def test_connection(self) -> bool:

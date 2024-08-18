@@ -26,16 +26,18 @@ class Movie(BaseModel):
     @classmethod
     def from_trakt(cls, trakt_movie):
         return cls(title = trakt_movie.title,
-            year = trakt_movie.year,
-            imdb_id = trakt_movie.imdb,
-            trakt_id = trakt_movie.trakt,
-            slug = trakt_movie.slug)
+            year = str(trakt_movie.year),
+            imdb_id = str(trakt_movie.imdb),
+            trakt_id = str(trakt_movie.trakt),
+            slug = trakt_movie.slug
+        )
 
     @classmethod
     def from_plex(cls, plex_movie):
-        return cls(title = plex_movie.title,
-            year = plex_movie.year,
-            plex_id = plex_movie.guid)
+        return cls(title = plex_movie.title, 
+            year = str(plex_movie.year),
+            plex_id = str(plex_movie.guid)
+        )
 
     def get_availability(self, media_service) -> None:
         results = media_service.search(query = f'{self.title} + ({self.year})', media_type = 'movie', limit = 1)

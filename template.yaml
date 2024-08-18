@@ -6,7 +6,6 @@ Globals:
     Runtime: python3.11
     Layers:
       - !Ref DependenciesLayer
-      - arn:aws:lambda:ca-central-1:017000801446:layer:AWSLambdaPowertoolsPythonV2:76
     Timeout: 60
     Environment:
       Variables:

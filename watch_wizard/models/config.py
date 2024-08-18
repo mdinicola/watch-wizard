@@ -1,13 +1,13 @@
 from datetime import datetime
-from pydantic import BaseModel, PrivateAttr
+from pydantic import BaseModel, PrivateAttr, SecretStr
 from typing import Callable
 
 class TraktConfig(BaseModel):
     _update_func: Callable = PrivateAttr()
     client_id: str
-    client_secret: str
-    oauth_token: str
-    oauth_refresh_token: str
+    client_secret: SecretStr
+    oauth_token: SecretStr
+    oauth_refresh_token: SecretStr
     oauth_expiry_date: int
 
     def __init__(self, **data):
@@ -22,8 +22,8 @@ class TraktConfig(BaseModel):
 
 class PlexConfig(BaseModel):
     _update_func: Callable = PrivateAttr()
-    username: str
-    password: str
+    username: SecretStr
+    password: SecretStr
     server_name: str
 
     def __init__(self, **data):
