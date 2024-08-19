@@ -7,6 +7,7 @@ phases:
     commands:
       - python3 -m pip install flake8
   build:
+    on-failure: ABORT
     commands:
       - python3 -m flake8
       - sam build
