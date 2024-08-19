@@ -13,6 +13,7 @@ app = APIGatewayRestResolver()
 config_service = None
 plex_service = None
 
+
 def lambda_handler(event: dict, context: LambdaContext) -> dict:
     return app.resolve(event, context)
 
@@ -33,8 +34,8 @@ def health_check() -> dict:
         data = {
             'plex': plex_service.test_connection()
         }
-        
         return data
+
     except Exception as e:
         data = {
             'plex': False,
@@ -42,15 +43,16 @@ def health_check() -> dict:
         }
         return data
 
-## Error Handling
+
+# Error Handling
 
 @app.exception_handler(Exception)
 def handle_exception(e: Exception):
     logger.error(e)
     return Response(
-        status_code = HTTPStatus.INTERNAL_SERVER_ERROR,
-        content_type = content_types.APPLICATION_JSON,
-        body = {
+        status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
+        content_type=content_types.APPLICATION_JSON,
+        body={
             'error': {
                 'msg': str(e)
             }

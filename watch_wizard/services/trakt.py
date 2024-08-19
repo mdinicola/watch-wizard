@@ -4,24 +4,26 @@ from trakt import movies as TraktMovies
 from trakt import users
 from models.trakt import DeviceAuthData
 from services.config import TraktConfig
-import logging
 import time
 import random
 
 _logger = Logger()
 
+
 class TraktService:
     def __init__(self, config: TraktConfig) -> None:
-        self._config: TraktConfig = config          
-        self._validate_config() 
+        self._config: TraktConfig = config
+        self._validate_config()
 
     def _validate_config(self) -> None:
         if self._config.client_id is None or self._config.client_secret is None:
             raise TypeError('Trakt configuration is invalid or not set')
 
+    def _update_config(self, oauth_expiry_date=None) -> None:
+        oauth_token = self._config.oauth_token.get_secret_value()
+        oauth_refresh_token = self._config.oauth_refresh_token.get_secret_value()
 
-    def _update_config(self, oauth_expiry_date = None) -> None:
-        if core.OAUTH_TOKEN != self._config.oauth_token.get_secret_value() or core.OAUTH_REFRESH != self._config.oauth_refresh_token.get_secret_value():
+        if core.OAUTH_TOKEN != oauth_token or core.OAUTH_REFRESH != oauth_refresh_token:
             self._config.oauth_token = core.OAUTH_TOKEN
             self._config.oauth_refresh_token = core.OAUTH_REFRESH
             if oauth_expiry_date is None:
@@ -31,9 +33,15 @@ class TraktService:
             self._config.update()
 
     def get_auth_code(self) -> DeviceAuthData:
-        response = core.get_device_code(client_id = self._config.client_id, client_secret = self._config.client_secret.get_secret_value())
-        return DeviceAuthData(user_code = response['user_code'], device_code = response['device_code'], 
-            verification_url = response['verification_url'], poll_interval = response['interval'])
+        response = core.get_device_code(client_id=self._config.client_id,
+            client_secret=self._config.client_secret.get_secret_value())
+
+        return DeviceAuthData(
+            user_code=response['user_code'],
+            device_code=response['device_code'],
+            verification_url=response['verification_url'],
+            poll_interval=response['interval']
+        )
 
     def authenticate_device(self, device_auth_data: DeviceAuthData) -> dict:
         poll_interval = device_auth_data.poll_interval
@@ -53,8 +61,11 @@ class TraktService:
         }
 
         while True:
-            auth_response = core.get_device_token(device_code = device_auth_data.device_code, 
-                client_id = self._config.client_id, client_secret = self._config.client_secret.get_secret_value())
+            auth_response = core.get_device_token(
+                device_code=device_auth_data.device_code,
+                client_id=self._config.client_id,
+                client_secret=self._config.client_secret.get_secret_value()
+            )
 
             if auth_response.status_code == 200:
                 auth_data = auth_response.json()

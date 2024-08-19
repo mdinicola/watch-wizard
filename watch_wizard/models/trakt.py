@@ -1,5 +1,6 @@
 from pydantic import BaseModel
-   
+
+
 class DeviceAuthData(BaseModel):
     user_code: str
     device_code: str

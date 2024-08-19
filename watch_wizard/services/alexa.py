@@ -3,9 +3,9 @@ from services.config import AlexaConfig
 from ask_sdk_webservice_support.webservice_handler import WebserviceSkillHandler
 from ask_sdk_core.skill_builder import SkillBuilder
 import os
-import logging
 
 _logger = Logger()
+
 
 class AlexaService:
     def __init__(self, config: AlexaConfig) -> None:
