@@ -4,12 +4,15 @@ phases:
   install:
     runtime-versions:
       python: 3.11
+    commands:
+      - python3 -m pip install flake8
   build:
     commands:
-       - sam build 
+      - python3 -m flake8
+      - sam build
   post_build:
     commands:
-       - sam package --output-template-file packaged-template.yaml --s3-bucket $ARTIFACTS_BUCKET --s3-prefix $ARTIFACTS_FOLDER
+      - sam package --output-template-file packaged-template.yaml --s3-bucket $ARTIFACTS_BUCKET --s3-prefix $ARTIFACTS_FOLDER
 artifacts:
     files:
       - packaged-template.yaml
