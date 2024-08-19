@@ -13,7 +13,6 @@ trakt_service = TraktService(config_service.trakt_config)
 plex_service = PlexService(config_service.plex_config)
 media_service = MediaService(trakt_service, plex_service)
 
-### Define Alexa request handler classes
 
 class LaunchRequestHandler(AbstractRequestHandler):
     """Handler for Skill Launch."""
@@ -25,10 +24,11 @@ class LaunchRequestHandler(AbstractRequestHandler):
 
         return (
             handler_input.response_builder
-                .speak(speak_output)
-                .ask(speak_output)
-                .response
+            .speak(speak_output)
+            .ask(speak_output)
+            .response
         )
+
 
 class MovieRecommendationIntentHandler(AbstractRequestHandler):
     """Handler for Movie Recommendation Intent."""
@@ -42,22 +42,22 @@ class MovieRecommendationIntentHandler(AbstractRequestHandler):
 
         return (
             handler_input.response_builder
-                .speak(speak_output)
-                # .ask("add a reprompt if you want to keep the session open for the user to respond")
-                .response
+            .speak(speak_output)
+            .response
         )
-    
+
+
 class MovieAvailabilityIntentHandler(AbstractRequestHandler):
     """Handler for Movie Availability Intent."""
     def can_handle(self, handler_input):
         return ask_utils.is_intent_name("MovieAvailabilityIntent")(handler_input)
 
     def handle(self, handler_input):
-        movie_title_slot_value = ask_utils.get_slot_value_v2(handler_input,'movieTitle')
+        movie_title_slot_value = ask_utils.get_slot_value_v2(handler_input, 'movieTitle')
         movie_title_slot_values = list(map(lambda x: x.value, ask_utils.get_simple_slot_values(movie_title_slot_value)))
         movie_title = movie_title_slot_values[0]
 
-        year_slot_value = ask_utils.get_slot_value_v2(handler_input,'year')
+        year_slot_value = ask_utils.get_slot_value_v2(handler_input, 'year')
         if year_slot_value is not None:
             year_slot_values = list(map(lambda x: x.value, ask_utils.get_simple_slot_values(year_slot_value)))
             year = year_slot_values[0]
@@ -69,15 +69,15 @@ class MovieAvailabilityIntentHandler(AbstractRequestHandler):
             message = f'Found movie: {movie.title} ({movie.year}).  {movie.availability_message()}'
         else:
             message = f'I was unable to find movie: {movie_title}'
-        
+
         speak_output = message
 
         return (
             handler_input.response_builder
-                .speak(speak_output)
-                # .ask("add a reprompt if you want to keep the session open for the user to respond")
-                .response
+            .speak(speak_output)
+            .response
         )
+
 
 class HelpIntentHandler(AbstractRequestHandler):
     """Handler for Help Intent."""
@@ -89,25 +89,27 @@ class HelpIntentHandler(AbstractRequestHandler):
 
         return (
             handler_input.response_builder
-                .speak(speak_output)
-                .ask(speak_output)
-                .response
+            .speak(speak_output)
+            .ask(speak_output)
+            .response
         )
-    
+
+
 class CancelOrStopIntentHandler(AbstractRequestHandler):
     """Single handler for Cancel and Stop Intent."""
     def can_handle(self, handler_input):
-        return (ask_utils.is_intent_name("AMAZON.CancelIntent")(handler_input) or
-                ask_utils.is_intent_name("AMAZON.StopIntent")(handler_input))
+        return (ask_utils.is_intent_name("AMAZON.CancelIntent")(handler_input)
+                or ask_utils.is_intent_name("AMAZON.StopIntent")(handler_input))
 
     def handle(self, handler_input):
         speak_output = "Goodbye!"
 
         return (
             handler_input.response_builder
-                .speak(speak_output)
-                .response
+            .speak(speak_output)
+            .response
         )
+
 
 class SessionEndedRequestHandler(AbstractRequestHandler):
     """Handler for Session End."""
@@ -118,6 +120,7 @@ class SessionEndedRequestHandler(AbstractRequestHandler):
         # Any cleanup logic goes here.
 
         return handler_input.response_builder.response
+
 
 class IntentReflectorHandler(AbstractRequestHandler):
     """The intent reflector is used for interaction model testing and debugging.
@@ -134,10 +137,10 @@ class IntentReflectorHandler(AbstractRequestHandler):
 
         return (
             handler_input.response_builder
-                .speak(speak_output)
-                # .ask("add a reprompt if you want to keep the session open for the user to respond")
-                .response
+            .speak(speak_output)
+            .response
         )
+
 
 class CatchAllExceptionHandler(AbstractExceptionHandler):
     """Generic error handling to capture any syntax or routing errors. If you receive an error
@@ -154,7 +157,7 @@ class CatchAllExceptionHandler(AbstractExceptionHandler):
 
         return (
             handler_input.response_builder
-                .speak(speak_output)
-                .ask(speak_output)
-                .response
+            .speak(speak_output)
+            .ask(speak_output)
+            .response
         )

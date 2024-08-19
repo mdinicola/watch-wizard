@@ -6,6 +6,7 @@ from models.media import Movie, Availability
 
 _logger = Logger()
 
+
 class MediaService:
     def __init__(self, trakt_service: TraktService, plex_service: PlexService) -> None:
         self._trakt_service = trakt_service
@@ -16,7 +17,7 @@ class MediaService:
         movie: Movie = Movie.from_trakt(trakt_movie)
         movie.get_availability(self)
         return movie
-    
+
     def search(self, query: str, media_type: str, limit: int) -> list[Movie]:
         results: list[PlexVideo] = self._plex_service.search_media(query, media_type, limit)
         media_list: list[Movie] = []
@@ -31,7 +32,7 @@ class MediaService:
             movie.availability = availability
             media_list.append(movie)
         return media_list
-    
+
     def get_media_availability(self, media: Movie) -> None:
         results: list[Movie] = self.search(f'{media.title} + ({media.year})', 1)
         if results:

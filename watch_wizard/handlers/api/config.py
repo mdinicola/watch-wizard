@@ -8,9 +8,9 @@ from utils import enhanced_json_serializer
 from services.config import ConfigService
 
 logger = Logger()
-app = APIGatewayRestResolver(serializer = enhanced_json_serializer)
-
+app = APIGatewayRestResolver(serializer=enhanced_json_serializer)
 config_service = None
+
 
 def lambda_handler(event: dict, context: LambdaContext) -> dict:
     return app.resolve(event, context)
@@ -28,15 +28,15 @@ def get_config():
     return config_service
 
 
-## Error Handling
+# Error Handling
 
 @app.exception_handler(Exception)
 def handle_exception(e: Exception):
     logger.exception(e)
     return Response(
-        status_code = HTTPStatus.INTERNAL_SERVER_ERROR,
-        content_type = content_types.APPLICATION_JSON,
-        body = {
+        status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
+        content_type=content_types.APPLICATION_JSON,
+        body={
             'error': {
                 'msg': str(e)
             }

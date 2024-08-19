@@ -9,6 +9,7 @@ from utils import distinct
 
 _logger = Logger()
 
+
 class PlexService:
     def __init__(self, config: PlexConfig) -> None:
         self._config = config
@@ -19,7 +20,7 @@ class PlexService:
         if self.account:
             return
         self.account = MyPlexAccount(self._config.username.get_secret_value(), self._config.password.get_secret_value())
-        self.server: PlexServer = self.account.resource(self._config.server_name).connect(ssl = True)
+        self.server: PlexServer = self.account.resource(self._config.server_name).connect(ssl=True)
 
     def test_connection(self) -> bool:
         try:
@@ -29,7 +30,7 @@ class PlexService:
         except Exception as e:
             _logger.error(e)
         return False
-    
+
     def search_media(self, query: str, media_type: str, limit: int = 1) -> list[PlexVideo]:
         self.connect()
         results: list[PlexVideo] = self.account.searchDiscover(query, limit, media_type)
@@ -38,9 +39,9 @@ class PlexService:
     def get_plex_availability(self, media: PlexVideo) -> Availability:
         plex_results = self.server.search(f'{media.title}')
         if plex_results:
-            return Availability(platform = 'plex', title = 'Plex')
+            return Availability(platform='plex', title='Plex')
         return None
-    
+
     def get_media_availability(self, media: PlexVideo) -> list[Availability]:
         self.connect()
         availability: list[Availability] = []
@@ -53,10 +54,10 @@ class PlexService:
         # Check if media is available on any streaming services
         streaming_services: list[PlexAvailability] = media.streamingServices()
         if (len(streaming_services) > 0):
-            subscription_streaming_services: list[PlexAvailability] = list(filter(lambda x: x.offerType == "subscription", streaming_services))
+            subscription_list = list(filter(lambda x: x.offerType == "subscription", streaming_services))
+            subscription_streaming_services: list[PlexAvailability] = subscription_list
             distinct_streaming_services = distinct(subscription_streaming_services, 'platform')
             subscription_availability: list[Availability] = list(map(Availability.from_plex, distinct_streaming_services))
             availability.extend(subscription_availability)
 
         return availability
-        

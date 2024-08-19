@@ -13,15 +13,15 @@ from services.config import ConfigService
 from services.trakt import TraktService
 from services.plex import PlexService
 from services.media import MediaService
-from models.media import Movie
 
 logger = Logger()
-app = APIGatewayRestResolver(enable_validation = True, serializer = enhanced_json_serializer)
+app = APIGatewayRestResolver(enable_validation=True, serializer=enhanced_json_serializer)
 
 config_service = None
 trakt_service = None
 plex_service = None
 media_service = None
+
 
 def lambda_handler(event: dict, context: LambdaContext):
     return app.resolve(event, context)
@@ -47,38 +47,39 @@ def recommend_movie():
 
 
 @app.get('/media/search')
-def search(title: Annotated[str, Query()], 
-    year: Annotated[Optional[str], Query()] = '', 
-    media_type: Annotated[Optional[str], Query(pattern = '^(movie|tvshow)$', alias = 'type')] = 'movie', 
-    limit: Annotated[Optional[int], Query()] = 1):
-        init()
-        query = f'{title}'
-        if year != '':
-            query = f'{title} ({year})'
+def search(title: Annotated[str, Query()],
+        year: Annotated[Optional[str], Query()] = '',
+        media_type: Annotated[Optional[str], Query(pattern='^(movie|tvshow)$', alias='type')] = 'movie',
+        limit: Annotated[Optional[int], Query()] = 1):
+    init()
+    query = f'{title}'
+    if year != '':
+        query = f'{title} ({year})'
+    return media_service.search(query, media_type, limit)
 
-        return media_service.search(query, media_type, limit)
 
-## Error Handling
+# Error Handling
 
 @app.exception_handler(RequestValidationError)
 @app.exception_handler(ValidationException)
 def handle_validation_error(e: ValidationException):
     logger.error(e.errors())
     return Response(
-        status_code = HTTPStatus.BAD_REQUEST,
-        content_type = content_types.APPLICATION_JSON,
-        body = {
+        status_code=HTTPStatus.BAD_REQUEST,
+        content_type=content_types.APPLICATION_JSON,
+        body={
             'errors': e.errors()
         }
     )
+
 
 @app.exception_handler(Exception)
 def handle_exception(e: Exception):
     logger.exception(e)
     return Response(
-        status_code = HTTPStatus.INTERNAL_SERVER_ERROR,
-        content_type = content_types.APPLICATION_JSON,
-        body = {
+        status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
+        content_type=content_types.APPLICATION_JSON,
+        body={
             'error': {
                 'msg': str(e)
             }
