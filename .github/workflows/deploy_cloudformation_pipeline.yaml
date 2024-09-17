@@ -1,0 +1,32 @@
+name: Deploy Pipeline to CloudFormation
+
+# on:
+#   push:
+#     branches: [ "main" ]
+#   pull_request:
+#     branches: [ "main" ]
+
+jobs:
+  deploy:
+    name: Deploy pipeline to AWS
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - name: Configure AWS credentials
+        id: creds
+        uses: aws-actions/configure-aws-credentials@v4.0.2
+        with:
+          aws-region: ca-central-1
+          role-to-assume: ${{ secrets.AWS_DEPLOYMENT_ROLE_ARN }}
+
+
+      # - name: Deploy to AWS CloudFormation
+      #   id: deploy-pipeline
+      #   uses: aws-actions/aws-cloudformation-github-deploy@v1
+      #   with:
+      #     name: WatchWizardPipeline
+      #     template: pipeline.yaml
+      #     parameter-overrides: "MyParam1=myValue,MyParam2=${{ secrets.MY_SECRET_VALUE }}"
+      #     no-fail-on-empty-changeset: "1"
