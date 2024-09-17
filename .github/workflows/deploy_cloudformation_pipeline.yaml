@@ -1,6 +1,11 @@
 name: Deploy Pipeline to CloudFormation
 
-on: push
+on: 
+  workflow_dispatch:
+    branch:
+      description: 'branch name'
+      type: string
+      required: true
 #   push:
 #     branches: [ "main" ]
 #   pull_request:
