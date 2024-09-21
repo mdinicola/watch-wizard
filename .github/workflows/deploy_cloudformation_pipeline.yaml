@@ -22,8 +22,8 @@ jobs:
           aws-region: ca-central-1
           role-to-assume: ${{ secrets.AWS_DEPLOYMENT_ROLE_ARN }}
 
-      - name: 
-          run: echo "${{ github.ref_name }}"
+      - name: test branch
+        run: echo "${{ github.ref_name }}"
 
       # - name: Deploy to AWS CloudFormation
       #   id: deploy-pipeline
