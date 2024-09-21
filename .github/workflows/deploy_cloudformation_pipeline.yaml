@@ -15,15 +15,23 @@ jobs:
       id-token: write
       contents: read
     steps:
-      - name: Configure AWS credentials
-        id: creds
-        uses: aws-actions/configure-aws-credentials@v4.0.2
-        with:
-          aws-region: ca-central-1
-          role-to-assume: ${{ secrets.AWS_DEPLOYMENT_ROLE_ARN }}
+      # - name: Configure AWS credentials
+      #   id: creds
+      #   uses: aws-actions/configure-aws-credentials@v4
+      #   with:
+      #     aws-region: ca-central-1
+      #     role-to-assume: ${{ secrets.AWS_DEPLOYMENT_ROLE_ARN }}
 
       - name: test branch
         run: echo "${{ github.ref_name }}"
+
+      - name: checkout 
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: .
+
+      - name: list files
+        run: ls -l          
 
       # - name: Deploy to AWS CloudFormation
       #   id: deploy-pipeline
