@@ -28,5 +28,5 @@ jobs:
         with:
           name: WatchWizardPipeline
           template: pipeline.yaml
-          parameter-overrides: "RepositoryBranchName=${{ GITHUB_REF }},ArtifactsBucketName=${{ secrets.AWS_ARTIFACTS_BUCKET_NAME }},RepositoryConnectionArn=${{ secrets.AWS_REPOSITORY_CONNECTION_ARN }}"
+          parameter-overrides: "RepositoryBranchName=${{ github.ref_name }},ArtifactsBucketName=${{ secrets.AWS_ARTIFACTS_BUCKET_NAME }},RepositoryConnectionArn=${{ secrets.AWS_REPOSITORY_CONNECTION_ARN }}"
           no-fail-on-empty-changeset: "1"
