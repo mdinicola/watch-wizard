@@ -79,7 +79,7 @@ Resources:
                 FullRepositoryId: !Ref RepositoryName
                 BranchName: !Ref RepositoryBranchName
                 OutputArtifactFormat: CODE_ZIP
-                DetectChanges: true
+                DetectChanges: false
               OutputArtifacts:
                 - Name: SourceArtifact
         - Name: Build

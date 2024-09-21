@@ -15,29 +15,23 @@ jobs:
       id-token: write
       contents: read
     steps:
-      # - name: Configure AWS credentials
-      #   id: creds
-      #   uses: aws-actions/configure-aws-credentials@v4
-      #   with:
-      #     aws-region: ca-central-1
-      #     role-to-assume: ${{ secrets.AWS_DEPLOYMENT_ROLE_ARN }}
-
-      - name: test branch
-        run: echo "${{ github.ref_name }}"
-
       - name: checkout 
         uses: actions/checkout@v4
         with:
           sparse-checkout: .
+          
+      - name: Configure AWS credentials
+        id: creds
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: ca-central-1
+          role-to-assume: ${{ secrets.AWS_DEPLOYMENT_ROLE_ARN }}
 
-      - name: list files
-        run: ls -l          
-
-      # - name: Deploy to AWS CloudFormation
-      #   id: deploy-pipeline
-      #   uses: aws-actions/aws-cloudformation-github-deploy@v1
-      #   with:
-      #     name: WatchWizardPipeline
-      #     template: pipeline.yaml
-      #     parameter-overrides: "RepositoryBranchName=${{ github.ref_name }},ArtifactsBucketName=${{ secrets.AWS_ARTIFACTS_BUCKET_NAME }},RepositoryConnectionArn=${{ secrets.AWS_REPOSITORY_CONNECTION_ARN }}"
-      #     no-fail-on-empty-changeset: "1"
+      - name: Deploy to AWS CloudFormation
+        id: deploy-pipeline
+        uses: aws-actions/aws-cloudformation-github-deploy@v1
+        with:
+          name: WatchWizardPipeline
+          template: pipeline.yaml
+          parameter-overrides: "RepositoryBranchName=${{ github.ref_name }},ArtifactsBucketName=${{ secrets.AWS_ARTIFACTS_BUCKET_NAME }},RepositoryConnectionArn=${{ secrets.AWS_REPOSITORY_CONNECTION_ARN }}"
+          no-fail-on-empty-changeset: "1"
