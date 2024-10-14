@@ -1,15 +1,13 @@
-name: Deploy Pipeline to CloudFormation
+name: Deploy to AWS
 
 on: 
   workflow_dispatch:
-#   push:
-#     branches: [ "main" ]
-#   pull_request:
-#     branches: [ "main" ]
+  # push:
+  #   branches: [ "main", "release" ]
 
 jobs:
   deploy:
-    name: Deploy pipeline to AWS
+    name: Deploy to AWS
     runs-on: ubuntu-latest
     permissions:
       id-token: write
