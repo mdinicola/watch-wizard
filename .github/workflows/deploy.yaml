@@ -1,0 +1,41 @@
+name: Deploy to AWS
+
+on: 
+  workflow_dispatch:
+  # push:
+  #   branches: [ "main", "release" ]
+
+jobs:
+  deploy:
+    name: Deploy to AWS
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - name: checkout 
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: .
+          
+      - name: Configure AWS credentials
+        id: creds
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: ca-central-1
+          role-to-assume: ${{ secrets.AWS_DEPLOYMENT_ROLE_ARN }}
+
+      - name: Deploy CloudFormation stack
+        id: deploy-pipeline
+        uses: aws-actions/aws-cloudformation-github-deploy@v1
+        with:
+          name: WatchWizardPipeline
+          template: pipeline.yaml
+          parameter-overrides: "RepositoryBranchName=${{ github.ref_name }},ArtifactsBucketName=${{ secrets.AWS_ARTIFACTS_BUCKET_NAME }},RepositoryConnectionArn=${{ secrets.AWS_REPOSITORY_CONNECTION_ARN }}"
+          no-fail-on-empty-changeset: "1"
+
+      - name: Run CodePipeline
+        id: run-pipeline
+        shell: bash
+        run: |
+          aws codepipeline start-pipeline-execution --name WatchWizard
